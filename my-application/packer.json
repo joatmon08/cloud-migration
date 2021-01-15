@@ -1,0 +1,30 @@
+{
+  "builders": [
+    {
+      "type": "azure-arm",
+      "use_azure_cli_auth": true,
+      "managed_image_resource_group_name": "datacenter",
+      "managed_image_name": "my-application",
+      "os_type": "Linux",
+      "image_publisher": "Canonical",
+      "image_offer": "UbuntuServer",
+      "image_sku": "16.04-LTS",
+      "azure_tags": {
+        "created_by": "Packer"
+      },
+      "location": "Central US",
+      "vm_size": "Standard_B1s"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "my-application.service",
+      "destination": "/tmp/my-application.service"
+    },
+    {
+      "scripts": "install.sh",
+      "type": "shell"
+    }
+  ]
+}
