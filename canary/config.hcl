@@ -3,7 +3,7 @@ log_level = "INFO"
 port = 8558
 
 syslog {
-  enabled = true
+  enabled = false
 }
 
 buffer_period {
@@ -13,12 +13,14 @@ buffer_period {
 }
 
 consul {
-  address = "127.0.0.1:8500"
+  address = "consul-consul-server:8500"
 }
 
 driver "terraform" {
   log         = true
   persist_log = true
+  path = "/tmp"
+  working_dir = "/tmp/sync-tasks"
 
   required_providers {
     aws = {
@@ -36,6 +38,9 @@ terraform_provider "aws" {
   access_key = "{{ env \"AWS_ACCESS_KEY_ID\" }}"
   secret_key = "{{ env \"AWS_SECRET_ACCESS_KEY\" }}"
   token      = "{{ env \"AWS_SESSION_TOKEN\" }}"
+  assume_role {
+    role_arn     = "{{ env \"AWS_ROLE_ARN\" }}"
+  }
 }
 
 service {
@@ -51,5 +56,5 @@ task {
   services       = ["my-application"]
   source         = "joatmon08/listener-rule/aws"
   version        = "0.1.3"
-  variable_files = ["../../datacenter.module.tfvars"]
+  variable_files = ["/opt/consul-terraform-sync/datacenter.module.tfvars"]
 }
