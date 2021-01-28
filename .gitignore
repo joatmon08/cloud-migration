@@ -2,3 +2,5 @@ canary/*.module.tfvars
 canary/terraform
 canary/sync-tasks
 canary/consul-terraform-sync
+credentials
+canary/datacenter.module.tfvars
