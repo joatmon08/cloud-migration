@@ -7,9 +7,5 @@ controller:
   enabled: true
 ingressGateways:
   enabled: true
-  gateways:
-    - name: ingress-gateway
-      service:
-        type: LoadBalancer
 terminatingGateways:
   enabled: true
