@@ -16,7 +16,6 @@ provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
-  load_config_file       = false
 }
 
 module "eks" {
@@ -24,11 +23,12 @@ module "eks" {
     aws = aws.cloud
   }
   source           = "terraform-aws-modules/eks/aws"
-  version          = "13.2.1"
+  version          = "14.0.0"
   cluster_name     = var.datacenter
   cluster_version  = "1.18"
   subnets          = module.vpc.private_subnets
   write_kubeconfig = false
+  manage_aws_auth  = false
 
   tags = local.tags
 

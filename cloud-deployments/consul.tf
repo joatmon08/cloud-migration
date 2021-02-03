@@ -3,18 +3,9 @@ resource "helm_release" "consul" {
 
   chart = "https://github.com/hashicorp/consul-helm/archive/${var.consul_helm_version}.tar.gz"
 
-  set {
-    name  = "global.datacenter"
-    value = var.eks_cluster_name
-  }
-
-  set {
-    name  = "controller.enabled"
-    value = true
-  }
-
-  set {
-    name  = "connectInject.enabled"
-    value = true
-  }
+  values = [
+    templatefile("values.yaml", {
+      eks_cluster_name = var.eks_cluster_name
+    })
+  ]
 }
