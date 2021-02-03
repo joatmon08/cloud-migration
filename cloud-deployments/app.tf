@@ -1,5 +1,5 @@
 locals {
-  app_port = 30909
+  app_port = 9090
 }
 
 resource "kubernetes_service_account" "app" {
@@ -21,10 +21,9 @@ resource "kubernetes_service" "app" {
     port {
       port        = local.app_port
       target_port = local.app_port
-      node_port   = local.app_port
     }
 
-    type = "NodePort"
+    type = "ClusterIP"
   }
 }
 
