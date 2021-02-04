@@ -45,11 +45,14 @@ service {
 }
 
 task {
-  name           = "canary"
-  description    = "send canary traffic to my-application in datacenter cloud"
-  providers      = ["aws"]
-  services       = ["ingress-gateway","my-application"]
-  source         = "joatmon08/listener-rule/aws"
-  version        = "0.1.3"
-  variable_files = ["/Users/rosemarywang/demos/cloud-migration/canary/datacenter.module.tfvars"]
+  name        = "canary"
+  description = "send canary traffic to my-application in datacenter cloud"
+  providers   = ["aws"]
+  services    = ["ingress-gateway", "my-application"]
+  source      = "joatmon08/listener-rule/aws"
+  version     = "0.1.6"
+  variable_files = [
+    "/Users/rosemarywang/demos/cloud-migration/canary/datacenter.module.tfvars",
+    "/Users/rosemarywang/demos/cloud-migration/canary/service.tfvars"
+  ]
 }

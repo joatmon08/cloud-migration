@@ -29,3 +29,8 @@ variable "consul_terraform_sync_version" {
   type        = string
   description = "Docker image for Consul Terraform Sync"
 }
+
+variable "kubernetes_context" {
+  type        = string
+  description = "Kubernetes context in kubeconfig"
+}

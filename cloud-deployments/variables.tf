@@ -25,6 +25,11 @@ variable "role_arn" {
   description = "Role ARN for provider to assume"
 }
 
+variable "kubernetes_context" {
+  type        = string
+  description = "Kubernetes context in kubeconfig"
+}
+
 variable "consul_helm_version" {
   type        = string
   description = "version of Consul Helm chart"

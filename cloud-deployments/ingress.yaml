@@ -10,14 +10,11 @@ apiVersion: consul.hashicorp.com/v1alpha1
 kind: IngressGateway
 metadata:
   name: ingress-gateway
-  annotations:
-    "consul.hashicorp.com/service-meta-host": "my-application.my-company.net"
-    "consul.hashicorp.com/service-meta-weight": "10"
 spec:
   listeners:
-    - port: 30909
+    - port: 9090
       protocol: http
       services:
-        - name: my-application
+        - name: "my-application"
           hosts:
-            - "my-application.my-company.net"
+          - "my-application.my-company.net"

@@ -1,10 +1,6 @@
 terraform {
   required_version = ">=0.14"
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~>3.23"
-    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~>1.13.3"
@@ -12,26 +8,7 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.region
-  assume_role {
-    role_arn     = var.role_arn
-    session_name = "terraform"
-    external_id  = "terraform"
-  }
-}
-
-data "aws_eks_cluster" "cloud" {
-  name = var.eks_cluster_name
-}
-
-data "aws_eks_cluster_auth" "cloud" {
-  name = var.eks_cluster_name
-}
-
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cloud.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cloud.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.cloud.token
-  load_config_file       = false
+  config_path    = "~/.kube/config"
+  config_context = var.kubernetes_context
 }

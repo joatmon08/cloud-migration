@@ -22,8 +22,9 @@ resource "kubernetes_config_map" "consul_terraform_sync" {
   }
 
   data = {
-    "config.hcl"               = file("${path.module}/config.hcl")
+    "config.hcl"               = file("${path.module}/config.kubernetes.hcl")
     "datacenter.module.tfvars" = file("${path.module}/datacenter.module.tfvars")
+    "service.tfvars"           = file("${path.module}/service.tfvars")
   }
 }
 

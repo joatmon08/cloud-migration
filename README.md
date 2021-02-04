@@ -10,13 +10,40 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
 
 ## Usage
 
-1. Add `cloud`, `datacenter`, and `cloud-deployments` as Terraform working
-directories.
+1. Go into `datacenter` and run `terraform apply`.
+
+1. Go into `cloud` and run `terraform apply`.
+
+1. Go into `datacenter` and update the variable for `enable_peering = true`.
+   Run `terraform apply` to accept the peering connection from cloud.
+
+1. Set `kubectl` to the AWS EKS cluster in cloud.
+   ```shell
+   aws eks --region us-west-2 update-kubeconfig --name cloud
+   ```
+
+1. Change directory into `cloud-deployments`.
+   ```shell
+   cd cloud-deployments
+   ```
+
+1. Copy `credentials.example` to `credentials`.
+   ```shell
+   cp credentials.example credentials
+   ```
+
+1. In `credentials`, add the AWS role ARN and the Kubernetes context for EKS clusters.
+
+1. Deploy Consul Helm chart, ingress gateway configuration, and application to Kubernetes.
+   ```shell
+   terraform apply -var-file=credentials
+   ```
 
 1. Change directory into `datacenter`.
    ```shell
    cd datacenter
    ```
+
 1. Get the Terraform outputs, including the load balancer, target groups, and VPC ID.
    Copy the values, you will need them for `canary/datacenter.module.tfvars`.
    ```shell
@@ -45,6 +72,12 @@ directories.
 1. Deploy Consul Terraform Sync to Kubernetes.
    ```shell
    terraform apply -var-file=credentials
+   ```
+
+1. To verify everything is working, get the load balancer's DNS and issue
+   an HTTP GET request with the `Host` header set to `my-application.my-company.net`.
+   ```shell
+   curl -H 'Host:my-application.my-company.net' my-application-1971614036.us-east-2.elb.amazonaws.com
    ```
 
 ## Caveats
