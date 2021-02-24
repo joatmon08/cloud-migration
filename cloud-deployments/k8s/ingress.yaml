@@ -1,0 +1,20 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: my-application
+spec:
+  protocol: "http"
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: IngressGateway
+metadata:
+  name: ingress-gateway
+spec:
+  listeners:
+    - port: 9090
+      protocol: http
+      services:
+        - name: "my-application"
+          hosts:
+          - "my-application.my-company.net"
