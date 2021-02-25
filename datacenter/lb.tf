@@ -1,6 +1,6 @@
-resource "aws_lb" "nomad" {
+resource "aws_lb" "app" {
   provider           = aws.datacenter
-  name               = var.datacenter
+  name               = var.application_name
   internal           = false
   load_balancer_type = "application"
   subnets            = module.vpc.public_subnets
