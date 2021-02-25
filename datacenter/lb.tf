@@ -10,7 +10,7 @@ resource "aws_lb" "nomad" {
   tags = local.tags
 }
 
-resource "aws_lb_listener" "nomad" {
+resource "aws_lb_listener" "app" {
   provider          = aws.datacenter
   load_balancer_arn = aws_lb.nomad.arn
   port              = "80"
@@ -30,16 +30,8 @@ resource "aws_lb_target_group" "nomad" {
   vpc_id   = module.vpc.vpc_id
 
   health_check {
-    enabled  = true
-    interval = 15
-    timeout  = 5
-    protocol = "HTTP"
-    port     = "traffic-port"
-    path     = "/v1/agent/health"
-    matcher  = "200"
-
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
+    enabled = true
+    path    = "/v1/status/peers"
   }
 }
 
