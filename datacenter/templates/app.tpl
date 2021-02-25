@@ -22,6 +22,7 @@ After=syslog.target network.target
 Environment="MESSAGE=${description}"
 Environment="NAME=${description}"
 Environment=ERROR_RATE=${error_rate}
+Environment=UPSTREAM_URIS="${upstream_uris}"
 ExecStart=/usr/local/bin/fake-service
 ExecStop=/bin/sleep 5
 Restart=always

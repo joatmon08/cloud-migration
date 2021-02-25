@@ -1,9 +1,9 @@
 resource "aws_lb" "app" {
   provider           = aws.datacenter
   name               = var.application_name
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
-  subnets            = module.vpc.public_subnets
+  subnets            = module.vpc.private_subnets
 
   enable_deletion_protection = false
 

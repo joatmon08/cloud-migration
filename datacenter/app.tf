@@ -28,6 +28,7 @@ resource "aws_instance" "app" {
     fake_service_version = var.fake_service_version
     description          = "${var.application_name} (${var.datacenter})"
     error_rate           = 0.0
+    upstream_uris        = ""
   })
 
   tags = merge({ "Name" = var.application_name }, local.tags)
