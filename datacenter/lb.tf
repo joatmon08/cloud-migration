@@ -31,7 +31,7 @@ resource "aws_lb_target_group" "nomad" {
 
   health_check {
     enabled = true
-    path    = "/v1/status/peers"
+    path    = "/ui"
   }
 }
 
