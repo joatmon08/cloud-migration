@@ -10,18 +10,6 @@ resource "aws_lb" "nomad" {
   tags = local.tags
 }
 
-resource "aws_lb_listener" "app" {
-  provider          = aws.datacenter
-  load_balancer_arn = aws_lb.nomad.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.nomad.arn
-  }
-}
-
 resource "aws_lb_target_group" "nomad" {
   provider = aws.datacenter
   name     = "nomad-${var.datacenter}"
