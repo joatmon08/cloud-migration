@@ -1,8 +1,8 @@
 resource "aws_security_group_rule" "load_balancer" {
   provider          = aws.datacenter
   type              = "ingress"
-  from_port         = 4646
-  to_port           = 4646
+  from_port         = 9090
+  to_port           = 9090
   protocol          = "tcp"
   cidr_blocks       = [module.vpc.vpc_cidr_block]
   security_group_id = module.vpc.default_security_group_id
