@@ -59,7 +59,6 @@ resource "kubernetes_deployment" "app" {
         annotations = {
           "consul.hashicorp.com/connect-inject" : "true",
           "consul.hashicorp.com/connect-service-port" : local.app_port,
-          "consul.hashicorp.com/service-meta-host" : "my-application.my-company.net",
           "consul.hashicorp.com/service-meta-weight" : 0
         }
       }

@@ -42,6 +42,9 @@ service {
   name        = "my-application"
   datacenter  = "cloud"
   description = "all instances of the service my-application in datacenter cloud"
+  cts_user_defined_meta = {
+    host   = "my-application.my-company.net"
+  }
 }
 
 task {
@@ -49,8 +52,8 @@ task {
   description = "send canary traffic to my-application in datacenter cloud"
   providers   = ["aws"]
   services    = ["ingress-gateway", "my-application"]
-  source      = "joatmon08/listener-rule/aws"
-  version     = "0.1.6"
+  source      = "joatmon08/listenerrule-nia/aws"
+  version     = "0.2.1"
   variable_files = [
     "/Users/rosemarywang/demos/cloud-migration/canary/datacenter.module.tfvars",
     "/Users/rosemarywang/demos/cloud-migration/canary/service.tfvars"
