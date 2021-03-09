@@ -3,5 +3,6 @@ canary/terraform
 canary/sync-tasks
 canary/consul-terraform-sync
 credentials
+credentials.auto.tfvars
 canary/datacenter.module.tfvars
 modules/boundary-deployment/bin/id_rsa

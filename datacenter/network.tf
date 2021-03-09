@@ -17,9 +17,14 @@ module "vpc" {
   name = var.datacenter
   cidr = "172.25.16.0/24"
 
-  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
-  private_subnets = ["172.25.16.0/28", "172.25.16.16/28", "172.25.16.32/28"]
-  public_subnets  = ["172.25.16.208/28", "172.25.16.224/28", "172.25.16.240/28"]
+  azs             = slice(data.aws_availability_zones.available.names, 0, 1)
+  private_subnets = ["172.25.16.0/28"]
+  public_subnets  = ["172.25.16.208/28"]
+
+
+  # azs             = slice(data.aws_availability_zones.available.names, 0, 3)
+  # private_subnets = ["172.25.16.0/28", "172.25.16.16/28", "172.25.16.32/28"]
+  # public_subnets  = ["172.25.16.208/28", "172.25.16.224/28", "172.25.16.240/28"]
 
   enable_nat_gateway = true
   single_nat_gateway = false
