@@ -34,8 +34,3 @@ variable "consul_helm_version" {
   type        = string
   description = "version of Consul Helm chart"
 }
-
-variable "loki_stack_helm_version" {
-  type        = string
-  description = "version of loki-stack Helm chart from Grafana"
-}

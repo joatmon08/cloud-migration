@@ -9,13 +9,3 @@ resource "helm_release" "consul" {
     })
   ]
 }
-
-resource "helm_release" "loki" {
-  name = "loki"
-
-  chart = "https://github.com/grafana/helm-charts/releases/download/loki-stack-${var.loki_stack_helm_version}/loki-stack-${var.loki_stack_helm_version}.tgz"
-
-  values = [
-    templatefile("templates/loki.tpl", {})
-  ]
-}
