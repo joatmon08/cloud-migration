@@ -15,7 +15,7 @@ resource "aws_instance" "ui" {
     fake_service_version = var.fake_service_version
     description          = "${local.ui_name} (${var.datacenter})"
     error_rate           = 0.0
-    upstream_uris        = "http://${aws_lb.app.dns_name}"
+    upstream_uris        = "http://${aws_instance.app.private_ip}"
   })
 
   tags = merge({ "Name" = local.ui_name }, local.tags)

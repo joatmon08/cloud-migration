@@ -19,3 +19,14 @@ resource "aws_security_group_rule" "listener" {
   security_group_id = module.vpc.default_security_group_id
   description       = "Allow connection from client to load balancer"
 }
+
+resource "aws_security_group_rule" "consul" {
+  provider          = aws.datacenter
+  type              = "ingress"
+  from_port         = 8500
+  to_port           = 8500
+  protocol          = "tcp"
+  cidr_blocks       = [var.client_ip_address]
+  security_group_id = module.vpc.default_security_group_id
+  description       = "Allow connection from client to Consul server"
+}

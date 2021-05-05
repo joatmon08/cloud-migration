@@ -33,9 +33,3 @@ resource "aws_instance" "app" {
 
   tags = merge({ "Name" = var.application_name }, local.tags)
 }
-
-resource "aws_lb_target_group_attachment" "app" {
-  provider         = aws.datacenter
-  target_group_arn = aws_lb_target_group.app.arn
-  target_id        = aws_instance.app.id
-}
