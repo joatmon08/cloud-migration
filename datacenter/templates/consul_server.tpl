@@ -4,11 +4,11 @@ set -e
 apt-get update && apt-get install -y unzip
 
 # Versions
-ENVOY_DOWNLOAD="https://getenvoy.io/cli"
 ENVOY_VERSION="1.16.2"
+ENVOY_DOWNLOAD="https://getenvoy.io/cli"
 
-CONSUL_DOWNLOAD="1.9.5"
-CONSUL_VERSION="https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip"
+CONSUL_VERSION="1.9.5"
+CONSUL_DOWNLOAD="https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip"
 
 # Get internal IP
 LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
@@ -88,7 +88,7 @@ cat << EOF > /etc/systemd/system/consul.service
 Description=Consul Server
 After=syslog.target network.target
 [Service]
-ExecStart=/usr/local/bin/consul agent -config-file=/etc/consul/config.hcl
+ExecStart=/usr/bin/consul agent -config-file=/etc/consul/config.hcl
 ExecStop=/bin/sleep 5
 Restart=always
 [Install]
@@ -107,7 +107,7 @@ After=syslog.target network.target
 [Service]
 Environment=CONSUL_HTTP_ADDR=$${LOCAL_IPV4}:8500
 Environment=CONSUL_GRPC_ADDR=$${LOCAL_IPV4}:8502
-ExecStart=/usr/local/bin/consul connect envoy -gateway mesh -register -address $${LOCAL_IPV4}:8443 -wan-address ${dc_public_ip}:8443
+ExecStart=/usr/bin/consul connect envoy -gateway mesh -register -address $${LOCAL_IPV4}:8443 -wan-address ${dc_public_ip}:8443
 ExecStop=/bin/sleep 5
 Restart=always
 [Install]
