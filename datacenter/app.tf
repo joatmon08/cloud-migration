@@ -19,6 +19,7 @@ resource "aws_instance" "app" {
   provider      = aws.datacenter
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
+  key_name      = "rosemary"
 
   vpc_security_group_ids      = [module.vpc.default_security_group_id]
   subnet_id                   = module.vpc.private_subnets[0]
@@ -29,6 +30,9 @@ resource "aws_instance" "app" {
     description          = "${var.application_name} (${var.datacenter})"
     error_rate           = 0.0
     upstream_uris        = ""
+    app_name             = var.application_name
+    dc                   = var.datacenter
+    consul_http_addr     = aws_instance.consul_server.private_ip
   })
 
   tags = merge({ "Name" = var.application_name }, local.tags)
