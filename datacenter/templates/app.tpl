@@ -77,6 +77,16 @@ services {
         interval = "10s"
       }
       proxy {
+        %{ if upstream != "" }
+        upstreams {
+          destination_name   = "${upstream}"
+          local_bind_address = "127.0.0.1"
+          local_bind_port    = 9091
+          config {
+            protocol = "http"
+          }
+        }
+        %{ endif }
         config {
           protocol                   = "http"
           envoy_prometheus_bind_addr = "0.0.0.0:9102"

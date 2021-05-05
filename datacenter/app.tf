@@ -29,6 +29,7 @@ resource "aws_instance" "app" {
     fake_service_version = var.fake_service_version
     description          = "${var.application_name} (${var.datacenter})"
     error_rate           = 0.0
+    upstream             = ""
     upstream_uris        = ""
     app_name             = var.application_name
     dc                   = var.datacenter
