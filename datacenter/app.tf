@@ -19,7 +19,6 @@ resource "aws_instance" "app" {
   provider      = aws.datacenter
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
-  key_name      = "rosemary"
 
   vpc_security_group_ids      = [module.vpc.default_security_group_id]
   subnet_id                   = module.vpc.private_subnets[0]
