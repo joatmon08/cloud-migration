@@ -1,31 +1,32 @@
 global:
   name: consul
   datacenter: ${eks_cluster_name}
+  tls:
+    enabled: true
+    caCert:
+      secretName: consul-federation
+      secretKey: caCert
+    caKey:
+      secretName: consul-federation
+      secretKey: caKey
+  metrics:
+    enabled: true
+  federation:
+    enabled: true
+
+prometheus:
+  enabled: true
 
 server:
-  # use 1 server
   replicas: 1
-  bootstrapExpect: 1
-  disruptionBudget:
-    enabled: true
-    maxUnavailable: 0
   extraConfig: |
     {
-      "telemetry": {
-        "prometheus_retention_time": "10s"
-      },
-      "ui_config": {
-        "enabled": true,
-        "metrics_provider": "prometheus",
-        "metrics_proxy": {
-          "base_url": "http://prometheus-server"
-        }
-      }
+      "primary_datacenter": "<your VM datacenter name>",
+      "primary_gateways": ["<ip of your VM mesh gateway>", "<other ip>", ...]
     }
 
 client:
   enabled: true
-  grpc: true
 
 connectInject:
   enabled: true
@@ -36,19 +37,5 @@ ui:
 controller:
   enabled: true
 
-ingressGateways:
+meshGateway:
   enabled: true
-  gateways:
-    - name: ingress-gateway
-      replicas: 1
-      service:
-        type: NodePort
-        ports:
-          - port: 9090
-            nodePort: 30909
-
-terminatingGateways:
-  enabled: true
-  gateways:
-    - name: terminating-gateway
-      replicas: 1
