@@ -21,3 +21,7 @@ output "private_subnet_ids" {
 output "consul_server" {
   value = aws_eip.consul_server.public_ip
 }
+
+output "ui_endpoint" {
+  value = aws_lb.ui.dns_name
+}
