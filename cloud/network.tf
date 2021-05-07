@@ -34,6 +34,11 @@ module "vpc" {
   single_nat_gateway = false
 
   tags = local.tags
+
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb"         = 1
+    "kubernetes.io/cluster/${var.datacenter}" = "shared"
+  }
 }
 
 resource "aws_vpc_peering_connection" "datacenter" {
