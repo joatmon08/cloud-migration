@@ -30,3 +30,14 @@ resource "aws_security_group_rule" "consul" {
   security_group_id = module.vpc.default_security_group_id
   description       = "Allow connection from client to Consul server"
 }
+
+resource "aws_security_group_rule" "mesh_gateway" {
+  provider          = aws.datacenter
+  type              = "ingress"
+  from_port         = 8443
+  to_port           = 8443
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.cloud.0.cidr_block]
+  security_group_id = module.vpc.default_security_group_id
+  description       = "Allow connection from cloud VPC to datacenter VPC"
+}
