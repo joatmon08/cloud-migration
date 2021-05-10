@@ -9,3 +9,13 @@ resource "helm_release" "consul" {
     })
   ]
 }
+
+resource "helm_release" "prometheus" {
+  name = "prometheus"
+
+  chart = "prometheus-community/prometheus"
+
+  values = [
+    templatefile("templates/prometheus.tpl", {})
+  ]
+}

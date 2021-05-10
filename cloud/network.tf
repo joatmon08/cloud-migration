@@ -24,11 +24,11 @@ module "vpc" {
   version = "3.0.0"
 
   name = var.datacenter
-  cidr = "10.0.1.0/24"
+  cidr = "10.0.1.0/16"
 
   azs             = slice(data.aws_availability_zones.available.names, 0, 3)
-  private_subnets = ["10.0.1.0/28", "10.0.1.16/28", "10.0.1.32/28"]
-  public_subnets  = ["10.0.1.208/28", "10.0.1.224/28", "10.0.1.240/28"]
+  private_subnets = ["10.0.1.0/26", "10.0.1.64/26", "10.0.1.128/26"]
+  public_subnets  = ["10.0.2.0/26", "10.0.2.64/26", "10.0.2.128/26"]
 
   enable_nat_gateway = true
   single_nat_gateway = false

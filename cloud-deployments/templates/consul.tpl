@@ -28,3 +28,5 @@ controller:
 meshGateway:
   enabled: true
   replicas: 1
+  annotations: |
+    'service.beta.kubernetes.io/aws-load-balancer-internal': "true"
