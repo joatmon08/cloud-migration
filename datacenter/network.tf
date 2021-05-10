@@ -12,7 +12,7 @@ module "vpc" {
     aws = aws.datacenter
   }
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~>2.64"
+  version = "3.0.0"
 
   name = var.datacenter
   cidr = "172.25.16.0/24"
