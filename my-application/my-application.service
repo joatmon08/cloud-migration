@@ -1,9 +1,0 @@
-[Unit]
-Description=My Application
-
-[Service]
-Environment=NAME=my-application-datacenter
-ExecStart=/usr/sbin/fake-service
-
-[Install]
-WantedBy=multi-user.target

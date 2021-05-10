@@ -30,11 +30,6 @@ resource "kubernetes_service" "app" {
 resource "kubernetes_deployment" "app" {
   depends_on = [helm_release.consul]
 
-  provisioner "local-exec" {
-    when    = destroy
-    command = "kubectl delete -f consul.yaml"
-  }
-
   metadata {
     name = var.application_name
     labels = {
@@ -101,12 +96,5 @@ resource "kubernetes_deployment" "app" {
         }
       }
     }
-  }
-}
-
-resource "null_resource" "ingress" {
-  depends_on = [kubernetes_deployment.app]
-  provisioner "local-exec" {
-    command = "kubectl apply -f consul.yaml"
   }
 }

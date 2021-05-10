@@ -11,3 +11,10 @@ federate:
 	cat datacenter-client-consul-0.pem | base64 >> datacenter/credentials
 	cat datacenter-client-consul-0-key.pem | base64 >> datacenter/credentials
 	cat consul-agent-ca.pem | base64 >> datacenter/credentials
+
+consul_config:
+	kubectl apply -f kubernetes/
+
+clean:
+	kubectl delete -f kubernetes/
+	rm -f *consul*.pem

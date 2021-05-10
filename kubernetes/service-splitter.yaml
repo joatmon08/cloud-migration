@@ -1,0 +1,10 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceSplitter
+metadata:
+  name: my-application
+spec:
+  splits:
+    - weight: 50
+      service: my-application
+    - weight: 50
+      service: my-application-cloud
