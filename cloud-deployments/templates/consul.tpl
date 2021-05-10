@@ -3,27 +3,15 @@ global:
   datacenter: ${eks_cluster_name}
   tls:
     enabled: true
-    caCert:
-      secretName: consul-federation
-      secretKey: caCert
-    caKey:
-      secretName: consul-federation
-      secretKey: caKey
+    enableAutoEncrypt: true
   metrics:
     enabled: true
   federation:
     enabled: true
-
-prometheus:
-  enabled: true
+    createFederationSecret: true
 
 server:
   replicas: 1
-  extraConfig: |
-    {
-      "primary_datacenter": "<your VM datacenter name>",
-      "primary_gateways": ["<ip of your VM mesh gateway>", "<other ip>", ...]
-    }
 
 client:
   enabled: true
@@ -39,3 +27,4 @@ controller:
 
 meshGateway:
   enabled: true
+  replicas: 1

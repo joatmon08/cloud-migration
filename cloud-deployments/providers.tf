@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~>2.0"
     }
+    kubernetes-alpha = {
+      source  = "hashicorp/kubernetes-alpha"
+      version = "~> 0.3"
+    }
     helm = {
       source  = "hashicorp/helm"
       version = "~>2.0"
@@ -28,4 +32,7 @@ provider "kubernetes" {
   config_context = var.kubernetes_context
 }
 
-provider "null" {}
+provider "kubernetes-alpha" {
+  config_path    = "~/.kube/config"
+  config_context = var.kubernetes_context
+}

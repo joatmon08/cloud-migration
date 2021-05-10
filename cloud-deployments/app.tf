@@ -32,7 +32,7 @@ resource "kubernetes_deployment" "app" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "kubectl delete -f ingress.yaml"
+    command = "kubectl delete -f consul.yaml"
   }
 
   metadata {
@@ -107,6 +107,6 @@ resource "kubernetes_deployment" "app" {
 resource "null_resource" "ingress" {
   depends_on = [kubernetes_deployment.app]
   provisioner "local-exec" {
-    command = "kubectl apply -f ingress.yaml"
+    command = "kubectl apply -f consul.yaml"
   }
 }
