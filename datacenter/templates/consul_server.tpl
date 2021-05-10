@@ -28,6 +28,19 @@ cp ~/.getenvoy/builds/standard/$${ENVOY_VERSION}/linux_glibc/bin/envoy /usr/bin/
 
 # Create the consul config
 mkdir -p /etc/consul
+mkdir -p /etc/consul/certs
+
+%{ if consul_cert_file != "" }
+echo '${consul_cert_file}' | base64 -d > /etc/consul/certs/datacenter-server-consul-0.pem
+%{ endif }
+
+%{ if consul_key_file != "" }
+echo '${consul_key_file}' | base64 -d > /etc/consul/certs/datacenter-server-consul-0-key.pem
+%{ endif }
+
+%{ if consul_ca_file != "" }
+echo '${consul_ca_file}' | base64 -d > /etc/consul/certs/consul-agent-ca.pem
+%{ endif }
 
 cat << EOF > /etc/consul/config.hcl
 data_dir = "/tmp/consul/server"
@@ -38,6 +51,15 @@ ui               = true
 advertise_addr   = "$${LOCAL_IPV4}"
 client_addr      = "0.0.0.0"
 bind_addr        = "0.0.0.0"
+
+primary_gateways = ["${primary_gateway}"]
+primary_datacenter = "cloud"
+
+%{ if consul_cert_file != "" }
+cert_file = "/etc/consul/certs/datacenter-server-consul-0.pem"
+key_file = "/etc/consul/certs/datacenter-server-consul-0-key.pem"
+ca_file = "/etc/consul/certs/consul-agent-ca.pem"
+%{ endif }
 
 ports {
   grpc = 8502

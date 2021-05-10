@@ -17,11 +17,16 @@ resource "aws_instance" "consul_server" {
 
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_id              = module.vpc.public_subnets[0]
+  key_name               = "rosemary"
 
   user_data = templatefile("${path.module}/templates/consul_server.tpl", {
-    prometheus_url = "http://localhost:9090"
-    dc             = var.datacenter
-    dc_public_ip   = aws_eip.consul_server.public_ip
+    prometheus_url   = "http://localhost:9090"
+    dc               = var.datacenter
+    dc_public_ip     = aws_eip.consul_server.public_ip
+    consul_cert_file = var.consul_cert_file
+    consul_key_file  = var.consul_key_file
+    consul_ca_file   = var.consul_ca_file
+    primary_gateway  = var.primary_gateway
   })
 
   tags = merge({ "Name" = "consul-server" }, local.tags)

@@ -46,6 +46,33 @@ variable "client_ip_address" {
   description = "IP address to connect to load balancer"
 }
 
+variable "consul_cert_file" {
+  type        = string
+  description = "Consul datacenter certificate contents, base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "consul_key_file" {
+  type        = string
+  description = "Consul datacenter certificate key file contents, base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "consul_ca_file" {
+  type        = string
+  description = "Consul datacenter certificate authority base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "primary_gateway" {
+  type        = string
+  description = "Consul primary mesh gateway from Kubernetes"
+  default     = ""
+}
+
 locals {
   tags = {
     Terraform   = "true"
