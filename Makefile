@@ -1,6 +1,10 @@
 kubeconfig:
 	aws eks --region us-west-2 update-kubeconfig --name cloud --role-arn ${TF_VAR_role_arn}
 
+encrypt_key:
+	consul keygen > credentials
+	kubectl create secret generic consul-gossip-encryption-key --from-literal=key=$(cat credentials)
+
 federate:
 	kubectl get secrets/consul-ca-cert --template='{{index .data "tls.crt" }}' | base64 -D > consul-agent-ca.pem
 	kubectl get secrets/consul-ca-key --template='{{index .data "tls.key" }}' | base64 -D > consul-agent-ca-key.pem

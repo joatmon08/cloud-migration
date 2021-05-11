@@ -12,3 +12,12 @@ server:
 
 alertmanager:
   enabled: false
+
+serviceFiles:
+  prometheus.yml:
+    scrape_configs:
+      - job_name: "envoy"
+        metrics_path: /metrics
+        consul_sd_configs:
+          - server: "consul-server:8501"
+            scheme: "https"
