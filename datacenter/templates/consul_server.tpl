@@ -140,7 +140,7 @@ cat << EOF > /etc/systemd/system/consul-gateway.service
 Description=Consul Mesh Gateway
 After=syslog.target network.target
 [Service]
-Environment=CONSUL_HTTP_ADDR=$${LOCAL_IPV4}:8500
+Environment=CONSUL_HTTP_ADDR=https://$${LOCAL_IPV4}:8501
 Environment=CONSUL_GRPC_ADDR=$${LOCAL_IPV4}:8502
 ExecStart=/usr/bin/consul connect envoy -gateway mesh -register -address $${LOCAL_IPV4}:8443 -wan-address ${dc_public_ip}:8443 -expose-servers
 ExecStop=/bin/sleep 5
