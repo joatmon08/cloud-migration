@@ -55,14 +55,23 @@ bind_addr        = "0.0.0.0"
 primary_gateways = ["${primary_gateway}"]
 primary_datacenter = "cloud"
 
-%{ if consul_cert_file != "" }
+%{ if consul_ca_file != "" }
 cert_file = "/etc/consul/certs/datacenter-server-consul-0.pem"
 key_file = "/etc/consul/certs/datacenter-server-consul-0-key.pem"
 ca_file = "/etc/consul/certs/consul-agent-ca.pem"
 %{ endif }
 
+verify_incoming_rpc    = true
+verify_outgoing        = true
+verify_server_hostname = true
+
 ports {
-  grpc = 8502
+  https = 8501
+  grpc  = 8502
+}
+
+auto_encrypt {
+  allow_tls = true
 }
 
 enable_central_service_config = true
@@ -129,7 +138,7 @@ After=syslog.target network.target
 [Service]
 Environment=CONSUL_HTTP_ADDR=$${LOCAL_IPV4}:8500
 Environment=CONSUL_GRPC_ADDR=$${LOCAL_IPV4}:8502
-ExecStart=/usr/bin/consul connect envoy -gateway mesh -register -address $${LOCAL_IPV4}:8443 -wan-address ${dc_public_ip}:8443
+ExecStart=/usr/bin/consul connect envoy -gateway mesh -register -address $${LOCAL_IPV4}:8443 -wan-address ${dc_public_ip}:8443 -expose-servers
 ExecStop=/bin/sleep 5
 Restart=always
 [Install]

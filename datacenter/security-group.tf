@@ -23,8 +23,8 @@ resource "aws_security_group_rule" "listener" {
 resource "aws_security_group_rule" "consul" {
   provider          = aws.datacenter
   type              = "ingress"
-  from_port         = 8500
-  to_port           = 8500
+  from_port         = 8501
+  to_port           = 8501
   protocol          = "tcp"
   cidr_blocks       = [var.client_ip_address]
   security_group_id = module.vpc.default_security_group_id
