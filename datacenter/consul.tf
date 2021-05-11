@@ -20,13 +20,14 @@ resource "aws_instance" "consul_server" {
   key_name               = "rosemary"
 
   user_data = templatefile("${path.module}/templates/consul_server.tpl", {
-    prometheus_url   = var.prometheus_url
-    dc               = var.datacenter
-    dc_public_ip     = aws_eip.consul_server.public_ip
-    consul_cert_file = var.consul_cert_file
-    consul_key_file  = var.consul_key_file
-    consul_ca_file   = var.consul_ca_file
-    primary_gateway  = var.primary_gateway
+    prometheus_url     = var.prometheus_url
+    dc                 = var.datacenter
+    dc_public_ip       = aws_eip.consul_server.public_ip
+    consul_cert_file   = var.consul_cert_file
+    consul_key_file    = var.consul_key_file
+    consul_ca_file     = var.consul_ca_file
+    consul_encrypt_key = var.consul_encrypt_key
+    primary_gateway    = var.primary_gateway
   })
 
   tags = merge({ "Name" = "consul-server" }, local.tags)

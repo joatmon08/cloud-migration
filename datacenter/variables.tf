@@ -62,6 +62,12 @@ variable "consul_ca_file" {
   default     = ""
 }
 
+variable "consul_encrypt_key" {
+  type        = string
+  description = "Consul gossip encryption key"
+  sensitive   = true
+}
+
 variable "primary_gateway" {
   type        = string
   description = "Consul primary mesh gateway from Kubernetes"

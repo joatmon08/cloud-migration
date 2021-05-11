@@ -52,6 +52,8 @@ advertise_addr   = "$${LOCAL_IPV4}"
 client_addr      = "0.0.0.0"
 bind_addr        = "0.0.0.0"
 
+enable_central_service_config = true
+
 primary_gateways = ["${primary_gateway}"]
 primary_datacenter = "cloud"
 
@@ -64,6 +66,8 @@ ca_file = "/etc/consul/certs/consul-agent-ca.pem"
 verify_incoming_rpc    = true
 verify_outgoing        = true
 verify_server_hostname = true
+
+encrypt = "${consul_encrypt_key}"
 
 ports {
   https = 8501
