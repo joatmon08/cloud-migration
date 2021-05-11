@@ -131,6 +131,10 @@ EOF
 
 chmod 644 /etc/systemd/system/consul.service
 
+systemctl daemon-reload
+systemctl enable consul
+systemctl start consul
+
 cat << EOF > /etc/systemd/system/consul-envoy.service
 [Unit]
 Description=Consul Envoy
@@ -145,13 +149,14 @@ EOF
 
 chmod 644 /etc/systemd/system/consul-envoy.service
 
+# Wait until Consul can be contacted
+until curl -s -k http://localhost:8500/v1/status/leader | grep 8300; do
+  echo "Waiting for Consul to start"
+  sleep 1
+done
+
 systemctl daemon-reload
-
-# Enable and start the daemons
-systemctl enable consul
 systemctl enable consul-envoy
-
-systemctl start consul
 systemctl start consul-envoy
 
 # Fetch Fake service

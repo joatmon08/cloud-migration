@@ -1,0 +1,4 @@
+nameOverride: storage
+
+persistence:
+  size: 8Gi

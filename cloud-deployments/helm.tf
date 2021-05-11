@@ -19,3 +19,15 @@ resource "helm_release" "prometheus" {
     templatefile("templates/prometheus.tpl", {})
   ]
 }
+
+resource "helm_release" "minio" {
+  name             = "s3"
+  namespace        = "storage"
+  create_namespace = true
+  chart            = "minio/minio"
+  version          = "8.0.10"
+
+  values = [
+    file("templates/minio.yaml")
+  ]
+}
