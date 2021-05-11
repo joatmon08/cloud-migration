@@ -9,6 +9,9 @@ global:
   federation:
     enabled: true
     createFederationSecret: true
+  gossipEncryption:
+    secretName: consul-gossip-encryption-key
+    secretKey: key
 
 server:
   replicas: 1
