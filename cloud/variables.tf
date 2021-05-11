@@ -18,6 +18,11 @@ variable "environment" {
   description = "environment"
 }
 
+variable "role_arn" {
+  type        = string
+  description = "Role ARN for provider to assume"
+}
+
 locals {
   tags = {
     Terraform   = "true"
