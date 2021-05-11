@@ -20,7 +20,7 @@ resource "aws_instance" "consul_server" {
   key_name               = "rosemary"
 
   user_data = templatefile("${path.module}/templates/consul_server.tpl", {
-    prometheus_url   = "http://localhost:9090"
+    prometheus_url   = var.prometheus_url
     dc               = var.datacenter
     dc_public_ip     = aws_eip.consul_server.public_ip
     consul_cert_file = var.consul_cert_file

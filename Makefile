@@ -11,6 +11,7 @@ federate:
 	cat datacenter-client-consul-0.pem | base64 >> datacenter/credentials
 	cat datacenter-client-consul-0-key.pem | base64 >> datacenter/credentials
 	cat consul-agent-ca.pem | base64 >> datacenter/credentials
+	kubectl exec statefulset/consul-server -- sh -c 'curl -sk https://localhost:8501/v1/catalog/service/mesh-gateway | jq ".[].ServiceTaggedAddresses.wan"'
 
 consul_config:
 	kubectl apply -f kubernetes/

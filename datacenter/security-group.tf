@@ -42,3 +42,27 @@ resource "aws_security_group_rule" "mesh_gateway" {
   security_group_id = module.vpc.default_security_group_id
   description       = "Allow connection from cloud VPC to datacenter VPC"
 }
+
+resource "aws_security_group_rule" "server_gossip" {
+  count             = var.enable_peering ? 1 : 0
+  provider          = aws.datacenter
+  type              = "ingress"
+  from_port         = 8300
+  to_port           = 8300
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.cloud.0.cidr_block]
+  security_group_id = module.vpc.default_security_group_id
+  description       = "Allow gossip from cloud VPC to datacenter VPC"
+}
+
+resource "aws_security_group_rule" "server_gossip_wan" {
+  count             = var.enable_peering ? 1 : 0
+  provider          = aws.datacenter
+  type              = "ingress"
+  from_port         = 8302
+  to_port           = 8302
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.cloud.0.cidr_block]
+  security_group_id = module.vpc.default_security_group_id
+  description       = "Allow gossip from cloud VPC to datacenter VPC"
+}
