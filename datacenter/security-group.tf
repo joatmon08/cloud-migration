@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "consul" {
   from_port         = 8501
   to_port           = 8501
   protocol          = "tcp"
-  cidr_blocks       = [var.client_ip_address]
+  cidr_blocks       = [var.client_ip_address, data.aws_vpc.cloud.0.cidr_block]
   security_group_id = module.vpc.default_security_group_id
   description       = "Allow connection from client to Consul server"
 }
