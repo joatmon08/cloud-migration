@@ -56,6 +56,8 @@ verify_incoming        = false
 verify_outgoing        = true
 verify_server_hostname = true
 
+encrypt = "${consul_encrypt_key}"
+
 auto_encrypt {
   tls = true
 }

@@ -35,6 +35,7 @@ resource "aws_instance" "app" {
     dc                   = var.datacenter
     consul_http_addr     = aws_instance.consul_server.private_ip
     consul_ca_file       = var.consul_ca_file
+    consul_encrypt_key   = var.consul_encrypt_key
   })
 
   tags = merge({ "Name" = var.application_name }, local.tags)
