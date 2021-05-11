@@ -20,6 +20,7 @@ resource "aws_instance" "ui" {
     app_name             = local.ui_name
     dc                   = var.datacenter
     consul_http_addr     = aws_instance.consul_server.private_ip
+    consul_ca_file       = var.consul_ca_file
   })
 
   tags = merge({ "Name" = local.ui_name }, local.tags)

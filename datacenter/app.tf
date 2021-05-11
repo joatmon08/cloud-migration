@@ -27,13 +27,13 @@ resource "aws_instance" "app" {
   user_data = templatefile("${path.module}/templates/app.tpl", {
     fake_service_version = var.fake_service_version
     description          = "${var.application_name} (${var.datacenter})"
-    consul_ca_file       = var.consul_ca_file
     error_rate           = 0.0
     upstream             = ""
     upstream_uris        = ""
     app_name             = var.application_name
     dc                   = var.datacenter
     consul_http_addr     = aws_instance.consul_server.private_ip
+    consul_ca_file       = var.consul_ca_file
   })
 
   tags = merge({ "Name" = var.application_name }, local.tags)

@@ -29,6 +29,10 @@ cp ~/.getenvoy/builds/standard/$${ENVOY_VERSION}/linux_glibc/bin/envoy /usr/bin/
 mkdir -p /etc/consul
 mkdir -p /etc/consul/certs
 
+%{ if consul_ca_file != "" }
+echo '${consul_ca_file}' | base64 -d > /etc/consul/certs/consul-agent-ca.pem
+%{ endif }
+
 cat << EOF > /etc/consul/config.hcl
 data_dir = "/tmp/consul/client"
 
@@ -39,6 +43,10 @@ client_addr    = "0.0.0.0"
 retry_join     = ["${consul_http_addr}"]
 
 datacenter = "${dc}"
+
+%{ if consul_ca_file != "" }
+ca_file = "/etc/consul/certs/consul-agent-ca.pem"
+%{ endif }
 
 ports {
   grpc = 8502
