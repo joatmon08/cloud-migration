@@ -1,0 +1,44 @@
+{
+ "appConfig": {},
+ "application": "web",
+ "id": "d6f19e16-47ee-4155-b31d-29026ef60732",
+ "index": 1,
+ "keepWaitingPipelines": false,
+ "lastModifiedBy": "anonymous",
+ "limitConcurrent": true,
+ "name": "Delete",
+ "spelEvaluator": "v4",
+ "stages": [
+  {
+   "account": "demo",
+   "app": "web",
+   "cloudProvider": "kubernetes",
+   "kinds": [
+    "deployment",
+    "service"
+   ],
+   "labelSelectors": {
+    "selectors": [
+     {
+      "key": "app",
+      "kind": "EQUALS",
+      "values": [
+       "web"
+      ]
+     }
+    ]
+   },
+   "location": "default",
+   "mode": "label",
+   "name": "Delete (Manifest)",
+   "options": {
+    "cascading": true
+   },
+   "refId": "1",
+   "requisiteStageRefIds": [],
+   "type": "deleteManifest"
+  }
+ ],
+ "triggers": [],
+ "updateTs": "1613760139000"
+}

@@ -1,0 +1,1149 @@
+{
+ "appConfig": {},
+ "application": "web",
+ "id": "81f16ae6-c7b3-449a-b77f-28eb7d8db71d",
+ "index": 0,
+ "keepWaitingPipelines": false,
+ "lastModifiedBy": "anonymous",
+ "limitConcurrent": true,
+ "name": "Deploy",
+ "parameterConfig": [
+  {
+   "default": "",
+   "description": "",
+   "hasOptions": false,
+   "label": "",
+   "name": "new_version",
+   "options": [
+    {
+     "value": ""
+    }
+   ],
+   "pinned": false,
+   "required": true
+  },
+  {
+   "default": "0.0",
+   "description": "",
+   "hasOptions": false,
+   "label": "",
+   "name": "error_rate",
+   "options": [
+    {
+     "value": ""
+    }
+   ],
+   "pinned": false,
+   "required": false
+  }
+ ],
+ "spelEvaluator": "v4",
+ "stages": [
+  {
+   "account": "demo",
+   "app": "web",
+   "cloudProvider": "kubernetes",
+   "expectedArtifacts": [],
+   "location": "default",
+   "manifestName": "deployment web",
+   "mode": "static",
+   "name": "Get Baseline",
+   "refId": "1",
+   "requisiteStageRefIds": [],
+   "type": "findArtifactsFromResource"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "apps/v1",
+     "kind": "Deployment",
+     "metadata": {
+      "labels": {
+       "app": "web",
+       "release": "canary"
+      },
+      "name": "web-canary"
+     },
+     "spec": {
+      "replicas": 3,
+      "selector": {
+       "matchLabels": {
+        "app": "web"
+       }
+      },
+      "template": {
+       "metadata": {
+        "annotations": {
+         "consul.hashicorp.com/connect-inject": "true",
+         "consul.hashicorp.com/service-meta-version": "canary",
+         "prometheus.io/port": "9102",
+         "prometheus.io/scrape": "true"
+        },
+        "labels": {
+         "app": "web",
+         "release": "canary"
+        }
+       },
+       "spec": {
+        "containers": [
+         {
+          "env": [
+           {
+            "name": "NAME",
+            "value": "Web (version ${ parameters.new_version })"
+           },
+           {
+            "name": "MESSAGE",
+            "value": "Web (version ${ parameters.new_version })"
+           },
+           {
+            "name": "ERROR_RATE",
+            "value": "${ parameters.error_rate }"
+           }
+          ],
+          "image": "nicholasjackson/fake-service:v0.19.1",
+          "livenessProbe": {
+           "httpGet": {
+            "path": "/health",
+            "port": 9090
+           },
+           "initialDelaySeconds": 3,
+           "periodSeconds": 3
+          },
+          "name": "web",
+          "ports": [
+           {
+            "containerPort": 9090
+           }
+          ]
+         }
+        ],
+        "serviceAccountName": "web"
+       }
+      }
+     }
+    },
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceResolver",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "defaultSubset": "baseline",
+      "subsets": {
+       "baseline": {
+        "filter": "Service.Meta.version == baseline"
+       },
+       "canary": {
+        "filter": "Service.Meta.version == canary"
+       }
+      }
+     }
+    },
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Deploy Canary",
+   "namespaceOverride": "default",
+   "refId": "2",
+   "requisiteStageRefIds": [
+    "1"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "analysisType": "realTime",
+   "canaryConfig": {
+    "beginCanaryAnalysisAfterMins": "0",
+    "canaryAnalysisIntervalMins": "3",
+    "canaryConfigId": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+    "lifetimeDuration": "PT0H3M",
+    "metricsAccountName": "metrics",
+    "scopes": [
+     {
+      "controlLocation": "default",
+      "controlScope": "baseline",
+      "experimentLocation": "default",
+      "experimentScope": "canary",
+      "extendedScopeParams": {},
+      "scopeName": "default"
+     }
+    ],
+    "scoreThresholds": {
+     "marginal": "75",
+     "pass": "95"
+    },
+    "storageAccountName": "minio"
+   },
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": true,
+   "failOnFailedExpressions": false,
+   "failPipeline": false,
+   "name": "10% Canary Analysis",
+   "refId": "3",
+   "requisiteStageRefIds": [
+    "6"
+   ],
+   "type": "kayentaCanary"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "apps/v1",
+     "kind": "Deployment",
+     "metadata": {
+      "labels": {
+       "app": "web"
+      },
+      "name": "web"
+     },
+     "spec": {
+      "replicas": 3,
+      "selector": {
+       "matchLabels": {
+        "app": "web"
+       }
+      },
+      "template": {
+       "metadata": {
+        "annotations": {
+         "consul.hashicorp.com/connect-inject": "true",
+         "consul.hashicorp.com/service-meta-version": "baseline",
+         "prometheus.io/port": "9102",
+         "prometheus.io/scrape": "true"
+        },
+        "labels": {
+         "app": "web"
+        }
+       },
+       "spec": {
+        "containers": [
+         {
+          "env": [
+           {
+            "name": "NAME",
+            "value": "Web (version ${ parameters.new_version })"
+           },
+           {
+            "name": "MESSAGE",
+            "value": "Web (version ${ parameters.new_version })"
+           }
+          ],
+          "image": "nicholasjackson/fake-service:v0.19.1",
+          "livenessProbe": {
+           "httpGet": {
+            "path": "/health",
+            "port": 9090
+           },
+           "initialDelaySeconds": 3,
+           "periodSeconds": 3
+          },
+          "name": "web",
+          "ports": [
+           {
+            "containerPort": 9090
+           }
+          ]
+         }
+        ]
+       }
+      }
+     }
+    },
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Release",
+   "namespaceOverride": "default",
+   "refId": "4",
+   "requisiteStageRefIds": [
+    "21"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 90
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 10
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "10% Canary",
+   "namespaceOverride": "default",
+   "refId": "6",
+   "requisiteStageRefIds": [
+    "2"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if Canary Failed",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "10% Canary Analysis",
+      "stageStatus": "FAILED_CONTINUE"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "7",
+   "requisiteStageRefIds": [
+    "3"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Rollback Canary",
+   "namespaceOverride": "default",
+   "refId": "8",
+   "requisiteStageRefIds": [
+    "7"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if 10% Canary Succeeded",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "10% Canary Analysis",
+      "stageStatus": "SUCCEEDED"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "9",
+   "requisiteStageRefIds": [
+    "3"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 70
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 30
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "30% Canary",
+   "namespaceOverride": "default",
+   "refId": "10",
+   "requisiteStageRefIds": [
+    "9"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "analysisType": "realTime",
+   "canaryConfig": {
+    "beginCanaryAnalysisAfterMins": "0",
+    "canaryAnalysisIntervalMins": "3",
+    "canaryConfigId": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+    "lifetimeDuration": "PT0H3M",
+    "metricsAccountName": "metrics",
+    "scopes": [
+     {
+      "controlLocation": "default",
+      "controlScope": "baseline",
+      "experimentLocation": "default",
+      "experimentScope": "canary",
+      "extendedScopeParams": {},
+      "scopeName": "default"
+     }
+    ],
+    "scoreThresholds": {
+     "marginal": "75",
+     "pass": "95"
+    },
+    "storageAccountName": "minio"
+   },
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": true,
+   "failOnFailedExpressions": false,
+   "failPipeline": false,
+   "name": "30% Canary Analysis",
+   "refId": "11",
+   "requisiteStageRefIds": [
+    "10"
+   ],
+   "type": "kayentaCanary"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if 30% Canary Succeeded",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "30% Canary Analysis",
+      "stageStatus": "SUCCEEDED"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "12",
+   "requisiteStageRefIds": [
+    "11"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 50
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 50
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "50% Canary",
+   "namespaceOverride": "default",
+   "refId": "13",
+   "requisiteStageRefIds": [
+    "12"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "analysisType": "realTime",
+   "canaryConfig": {
+    "beginCanaryAnalysisAfterMins": "0",
+    "canaryAnalysisIntervalMins": "3",
+    "canaryConfigId": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+    "lifetimeDuration": "PT0H3M",
+    "metricsAccountName": "metrics",
+    "scopes": [
+     {
+      "controlLocation": "default",
+      "controlScope": "baseline",
+      "experimentLocation": "default",
+      "experimentScope": "canary",
+      "extendedScopeParams": {},
+      "scopeName": "default"
+     }
+    ],
+    "scoreThresholds": {
+     "marginal": "75",
+     "pass": "95"
+    },
+    "storageAccountName": "minio"
+   },
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": true,
+   "failOnFailedExpressions": false,
+   "failPipeline": false,
+   "name": "50% Canary Analysis",
+   "refId": "14",
+   "requisiteStageRefIds": [
+    "13"
+   ],
+   "type": "kayentaCanary"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if 50% Canary Succeeded",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "50% Canary Analysis",
+      "stageStatus": "SUCCEEDED"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "15",
+   "requisiteStageRefIds": [
+    "14"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 30
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 70
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "70% Canary",
+   "namespaceOverride": "default",
+   "refId": "16",
+   "requisiteStageRefIds": [
+    "15"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "analysisType": "realTime",
+   "canaryConfig": {
+    "beginCanaryAnalysisAfterMins": "0",
+    "canaryAnalysisIntervalMins": "3",
+    "canaryConfigId": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+    "lifetimeDuration": "PT0H3M",
+    "metricsAccountName": "metrics",
+    "scopes": [
+     {
+      "controlLocation": "default",
+      "controlScope": "baseline",
+      "experimentLocation": "default",
+      "experimentScope": "canary",
+      "extendedScopeParams": {},
+      "scopeName": "default"
+     }
+    ],
+    "scoreThresholds": {
+     "marginal": "75",
+     "pass": "95"
+    },
+    "storageAccountName": "minio"
+   },
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": true,
+   "failOnFailedExpressions": false,
+   "failPipeline": false,
+   "name": "70% Canary Analysis",
+   "refId": "17",
+   "requisiteStageRefIds": [
+    "16"
+   ],
+   "type": "kayentaCanary"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if 70% Canary Succeeded",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "70% Canary Analysis",
+      "stageStatus": "SUCCEEDED"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "18",
+   "requisiteStageRefIds": [
+    "17"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 0
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 100
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "100% Canary",
+   "namespaceOverride": "default",
+   "refId": "19",
+   "requisiteStageRefIds": [
+    "18"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "analysisType": "realTime",
+   "canaryConfig": {
+    "beginCanaryAnalysisAfterMins": "0",
+    "canaryAnalysisIntervalMins": "3",
+    "canaryConfigId": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+    "lifetimeDuration": "PT0H3M",
+    "metricsAccountName": "metrics",
+    "scopes": [
+     {
+      "controlLocation": "default",
+      "controlScope": "baseline",
+      "experimentLocation": "default",
+      "experimentScope": "canary",
+      "extendedScopeParams": {},
+      "scopeName": "default"
+     }
+    ],
+    "scoreThresholds": {
+     "marginal": "75",
+     "pass": "95"
+    },
+    "storageAccountName": "minio"
+   },
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": true,
+   "failOnFailedExpressions": false,
+   "failPipeline": false,
+   "name": "100% Canary Analysis",
+   "refId": "20",
+   "requisiteStageRefIds": [
+    "19"
+   ],
+   "type": "kayentaCanary"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if 100% Canary Succeeded",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "100% Canary Analysis",
+      "stageStatus": "SUCCEEDED"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "21",
+   "requisiteStageRefIds": [
+    "20"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "app": "web",
+   "cloudProvider": "kubernetes",
+   "location": "default",
+   "manifestName": "deployment web-canary",
+   "mode": "static",
+   "name": "Delete Canary",
+   "options": {
+    "cascading": true
+   },
+   "refId": "22",
+   "requisiteStageRefIds": [
+    "4"
+   ],
+   "type": "deleteManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if Canary Failed",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "30% Canary Analysis",
+      "stageStatus": "FAILED_CONTINUE"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "23",
+   "requisiteStageRefIds": [
+    "11"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Rollback Canary",
+   "namespaceOverride": "default",
+   "refId": "24",
+   "requisiteStageRefIds": [
+    "23"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if Canary Failed",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "50% Canary Analysis",
+      "stageStatus": "FAILED_CONTINUE"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "25",
+   "requisiteStageRefIds": [
+    "14"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Rollback Canary",
+   "namespaceOverride": "default",
+   "refId": "26",
+   "requisiteStageRefIds": [
+    "25"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if Canary Failed",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "70% Canary Analysis",
+      "stageStatus": "FAILED_CONTINUE"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "27",
+   "requisiteStageRefIds": [
+    "17"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Rollback Canary",
+   "namespaceOverride": "default",
+   "refId": "28",
+   "requisiteStageRefIds": [
+    "27"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  },
+  {
+   "completeOtherBranchesThenFail": false,
+   "continuePipeline": false,
+   "failPipeline": false,
+   "name": "Check if Canary Failed",
+   "preconditions": [
+    {
+     "context": {
+      "stageName": "100% Canary Analysis",
+      "stageStatus": "FAILED_CONTINUE"
+     },
+     "failPipeline": true,
+     "type": "stageStatus"
+    }
+   ],
+   "refId": "29",
+   "requisiteStageRefIds": [
+    "20"
+   ],
+   "type": "checkPreconditions"
+  },
+  {
+   "account": "demo",
+   "cloudProvider": "kubernetes",
+   "manifests": [
+    {
+     "apiVersion": "consul.hashicorp.com/v1alpha1",
+     "kind": "ServiceSplitter",
+     "metadata": {
+      "name": "web"
+     },
+     "spec": {
+      "splits": [
+       {
+        "serviceSubset": "baseline",
+        "weight": 100
+       },
+       {
+        "serviceSubset": "canary",
+        "weight": 0
+       }
+      ]
+     }
+    }
+   ],
+   "moniker": {
+    "app": "web"
+   },
+   "name": "Rollback Canary",
+   "namespaceOverride": "default",
+   "refId": "30",
+   "requisiteStageRefIds": [
+    "29"
+   ],
+   "skipExpressionEvaluation": false,
+   "source": "text",
+   "trafficManagement": {
+    "enabled": false,
+    "options": {
+     "enableTraffic": false,
+     "services": []
+    }
+   },
+   "type": "deployManifest"
+  }
+ ],
+ "triggers": [],
+ "updateTs": "1615235029000"
+}

@@ -11,8 +11,7 @@ resource "helm_release" "consul" {
 }
 
 resource "helm_release" "prometheus" {
-  name = "prometheus"
-
+  name  = "prometheus"
   chart = "prometheus-community/prometheus"
 
   values = [
@@ -29,5 +28,15 @@ resource "helm_release" "minio" {
 
   values = [
     file("templates/minio.yaml")
+  ]
+}
+
+resource "helm_release" "grafana" {
+  name  = "grafana"
+  chart = "grafana/grafana"
+  values = [
+    templatefile("templates/grafana.yaml", {
+      dashboard_app = indent(8, file("dashboards/app.json"))
+    })
   ]
 }

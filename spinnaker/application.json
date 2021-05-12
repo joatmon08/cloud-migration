@@ -1,0 +1,20 @@
+{
+ "accounts": "demo",
+ "cloudProviders": "",
+ "dataSources": {
+  "disabled": [
+   "loadBalancers",
+   "securityGroups"
+  ],
+  "enabled": [
+   "canaryConfigs"
+  ]
+ },
+ "email": "7497D899-3D80-4105-9B00-0878F05B857E@mailinator.com",
+ "instancePort": 9090,
+ "lastModifiedBy": "anonymous",
+ "name": "web",
+ "trafficGuards": [],
+ "updateTs": "1613759705000",
+ "user": "[anonymous]"
+}

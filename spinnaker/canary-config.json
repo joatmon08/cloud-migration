@@ -1,0 +1,46 @@
+{
+ "applications": [
+  "web"
+ ],
+ "classifier": {
+  "groupWeights": {
+   "Envoy": 100
+  }
+ },
+ "configVersion": "1",
+ "createdTimestamp": 1613759899244,
+ "createdTimestampIso": "2021-02-19T18:38:19.244Z",
+ "description": "",
+ "id": "0afb9a63-1182-4911-b80c-836e4d6e4e76",
+ "judge": {
+  "judgeConfigurations": {},
+  "name": "NetflixACAJudge-v1.0"
+ },
+ "metrics": [
+  {
+   "analysisConfigurations": {
+    "canary": {
+     "direction": "increase",
+     "nanStrategy": "replace"
+    }
+   },
+   "groups": [
+    "Envoy"
+   ],
+   "name": "errors",
+   "query": {
+    "customFilterTemplate": "error500",
+    "metricName": "envoy_cluster_upstream_rq_xx",
+    "serviceType": "prometheus",
+    "type": "prometheus"
+   },
+   "scopeName": "default"
+  }
+ ],
+ "name": "web-canary",
+ "templates": {
+  "error500": "app=\"web\",envoy_response_code_class=\"5\",release=\"${scope}\",kubernetes_namespace=\"${location}\""
+ },
+ "updatedTimestamp": 1613759913813,
+ "updatedTimestampIso": "2021-02-19T18:38:33.813Z"
+}
