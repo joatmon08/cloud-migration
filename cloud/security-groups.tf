@@ -8,14 +8,3 @@ resource "aws_security_group_rule" "peered_vpc_ingress" {
   security_group_id = module.eks.cluster_primary_security_group_id
   description       = "Allow inbound connections from peered VPCs"
 }
-
-resource "aws_security_group_rule" "peered_vpc_ingress_mesh" {
-  provider          = aws.cloud
-  type              = "ingress"
-  from_port         = 8443
-  to_port           = 8443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = module.eks.cluster_primary_security_group_id
-  description       = "Allow inbound connections from peered VPCs"
-}
