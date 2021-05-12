@@ -16,7 +16,7 @@ resource "helm_release" "prometheus" {
   chart = "prometheus-community/prometheus"
 
   values = [
-    templatefile("templates/prometheus.tpl", {})
+    file("templates/prometheus.yaml")
   ]
 }
 

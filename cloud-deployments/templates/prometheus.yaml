@@ -1,0 +1,29 @@
+global:
+  scrape_interval:  5s
+  scrape_timeout: 3s
+
+server:
+  persistentVolume:
+    enabled: false
+
+alertmanager:
+  enabled: false
+
+extraScrapeConfigs: |
+  - job_name: "datacenter-envoy"
+    metrics_path: /metrics
+    consul_sd_configs:
+      - server: "consul-server:8501"
+        datacenter: "datacenter"
+        scheme: "https"
+        tls_config:
+          insecure_skip_verify: true
+        services:
+          - "my-application"
+          - "ui"
+    relabel_configs:
+      - source_labels: [__meta_consul_service_address]
+        regex: "(.*)"
+        replacement: '${1}:9102'
+        target_label: "__address__"
+        action: "replace"

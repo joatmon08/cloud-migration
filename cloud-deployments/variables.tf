@@ -34,3 +34,8 @@ variable "consul_helm_version" {
   type        = string
   description = "version of Consul Helm chart"
 }
+
+variable "consul_datacenter_address" {
+  type        = string
+  description = "Consul datacenter address"
+}
