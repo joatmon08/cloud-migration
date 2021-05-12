@@ -82,10 +82,6 @@ enable_central_service_config = true
 
 ui_config {
   enabled          = true
-  metrics_provider = "prometheus"
-  metrics_proxy {
-    base_url = "${prometheus_url}"
-  }
 }
 
 connect {

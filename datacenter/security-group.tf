@@ -21,6 +21,7 @@ resource "aws_security_group_rule" "listener" {
 }
 
 resource "aws_security_group_rule" "consul" {
+  count             = var.enable_peering ? 1 : 0
   provider          = aws.datacenter
   type              = "ingress"
   from_port         = 8501

@@ -74,11 +74,6 @@ variable "primary_gateway" {
   default     = ""
 }
 
-variable "prometheus_url" {
-  type        = string
-  description = "Prometheus URL"
-}
-
 locals {
   tags = {
     Terraform   = "true"
