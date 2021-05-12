@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "mesh_gateway" {
   from_port         = 8443
   to_port           = 8443
   protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.cloud.0.cidr_block]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = module.vpc.default_security_group_id
   description       = "Allow connection from cloud VPC to datacenter VPC"
 }
