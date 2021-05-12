@@ -25,17 +25,15 @@ spinnaker-deploy:
 spinnaker-pipelines:
 	spin application save -f spinnaker/application.json
 	spin canary canary-config save --file spinnaker/canary-config.json
-	spin pipeline save -f spinnaker/delete.json
 	spin pipeline save -f spinnaker/deploy.json
 
 spinnaker-pipelines-export:
-	spin application get web > spinnaker/application.json
-	spin canary canary-config get > spinnaker/canary-config.json
-	spin pipeline get delete > pinnaker/delete.json
-	spin pipeline get deploy > spinnaker/deploy.json
+	spin application get my-application > spinnaker/application.json
+	spin canary canary-config get --id 0afb9a63-1182-4911-b80c-836e4d6e4e76 > spinnaker/canary-config.json
+	spin pipeline get --application my-application --name Deploy > spinnaker/deploy.json
 
 load-test:
-	k6 run -e UI_ENDPOINT=$(shell cd datacenter && terraform output -raw ui_endpoint) k6/script.js --duration 120m
+	k6 run -e UI_ENDPOINT=http://$(shell cd datacenter && terraform output -raw ui_endpoint) k6/script.js --duration 120m
 
 clean:
 	bash shutdown.sh || true

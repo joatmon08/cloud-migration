@@ -1,145 +1,29 @@
 {
  "appConfig": {},
- "application": "web",
+ "application": "my-application",
  "id": "81f16ae6-c7b3-449a-b77f-28eb7d8db71d",
  "index": 0,
  "keepWaitingPipelines": false,
  "lastModifiedBy": "anonymous",
  "limitConcurrent": true,
  "name": "Deploy",
- "parameterConfig": [
-  {
-   "default": "",
-   "description": "",
-   "hasOptions": false,
-   "label": "",
-   "name": "new_version",
-   "options": [
-    {
-     "value": ""
-    }
-   ],
-   "pinned": false,
-   "required": true
-  },
-  {
-   "default": "0.0",
-   "description": "",
-   "hasOptions": false,
-   "label": "",
-   "name": "error_rate",
-   "options": [
-    {
-     "value": ""
-    }
-   ],
-   "pinned": false,
-   "required": false
-  }
- ],
+ "parameterConfig": [],
  "spelEvaluator": "v4",
  "stages": [
   {
-   "account": "demo",
-   "app": "web",
-   "cloudProvider": "kubernetes",
-   "expectedArtifacts": [],
-   "location": "default",
-   "manifestName": "deployment web",
-   "mode": "static",
-   "name": "Get Baseline",
-   "refId": "1",
-   "requisiteStageRefIds": [],
-   "type": "findArtifactsFromResource"
-  },
-  {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
-    {
-     "apiVersion": "apps/v1",
-     "kind": "Deployment",
-     "metadata": {
-      "labels": {
-       "app": "web",
-       "release": "canary"
-      },
-      "name": "web-canary"
-     },
-     "spec": {
-      "replicas": 3,
-      "selector": {
-       "matchLabels": {
-        "app": "web"
-       }
-      },
-      "template": {
-       "metadata": {
-        "annotations": {
-         "consul.hashicorp.com/connect-inject": "true",
-         "consul.hashicorp.com/service-meta-version": "canary",
-         "prometheus.io/port": "9102",
-         "prometheus.io/scrape": "true"
-        },
-        "labels": {
-         "app": "web",
-         "release": "canary"
-        }
-       },
-       "spec": {
-        "containers": [
-         {
-          "env": [
-           {
-            "name": "NAME",
-            "value": "Web (version ${ parameters.new_version })"
-           },
-           {
-            "name": "MESSAGE",
-            "value": "Web (version ${ parameters.new_version })"
-           },
-           {
-            "name": "ERROR_RATE",
-            "value": "${ parameters.error_rate }"
-           }
-          ],
-          "image": "nicholasjackson/fake-service:v0.19.1",
-          "livenessProbe": {
-           "httpGet": {
-            "path": "/health",
-            "port": 9090
-           },
-           "initialDelaySeconds": 3,
-           "periodSeconds": 3
-          },
-          "name": "web",
-          "ports": [
-           {
-            "containerPort": 9090
-           }
-          ]
-         }
-        ],
-        "serviceAccountName": "web"
-       }
-      }
-     }
-    },
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceResolver",
      "metadata": {
-      "name": "web"
+      "name": "my-application-cloud"
      },
      "spec": {
-      "defaultSubset": "baseline",
-      "subsets": {
-       "baseline": {
-        "filter": "Service.Meta.version == baseline"
-       },
-       "canary": {
-        "filter": "Service.Meta.version == canary"
-       }
+      "redirect": {
+       "datacenter": "cloud",
+       "service": "my-application"
       }
      }
     },
@@ -147,16 +31,16 @@
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -164,14 +48,12 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Deploy Canary",
    "namespaceOverride": "default",
    "refId": "2",
-   "requisiteStageRefIds": [
-    "1"
-   ],
+   "requisiteStageRefIds": [],
    "skipExpressionEvaluation": false,
    "source": "text",
    "trafficManagement": {
@@ -193,9 +75,9 @@
     "metricsAccountName": "metrics",
     "scopes": [
      {
-      "controlLocation": "default",
+      "controlLocation": "datacenter",
       "controlScope": "baseline",
-      "experimentLocation": "default",
+      "experimentLocation": "cloud",
       "experimentScope": "canary",
       "extendedScopeParams": {},
       "scopeName": "default"
@@ -219,93 +101,25 @@
    "type": "kayentaCanary"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
-     "apiVersion": "apps/v1",
-     "kind": "Deployment",
-     "metadata": {
-      "labels": {
-       "app": "web"
-      },
-      "name": "web"
-     },
-     "spec": {
-      "replicas": 3,
-      "selector": {
-       "matchLabels": {
-        "app": "web"
-       }
-      },
-      "template": {
-       "metadata": {
-        "annotations": {
-         "consul.hashicorp.com/connect-inject": "true",
-         "consul.hashicorp.com/service-meta-version": "baseline",
-         "prometheus.io/port": "9102",
-         "prometheus.io/scrape": "true"
-        },
-        "labels": {
-         "app": "web"
-        }
-       },
-       "spec": {
-        "containers": [
-         {
-          "env": [
-           {
-            "name": "NAME",
-            "value": "Web (version ${ parameters.new_version })"
-           },
-           {
-            "name": "MESSAGE",
-            "value": "Web (version ${ parameters.new_version })"
-           }
-          ],
-          "image": "nicholasjackson/fake-service:v0.19.1",
-          "livenessProbe": {
-           "httpGet": {
-            "path": "/health",
-            "port": 9090
-           },
-           "initialDelaySeconds": 3,
-           "periodSeconds": 3
-          },
-          "name": "web",
-          "ports": [
-           {
-            "containerPort": 9090
-           }
-          ]
-         }
-        ]
-       }
-      }
-     }
-    },
-    {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
-     "kind": "ServiceSplitter",
+     "kind": "ServiceResolver",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
-      "splits": [
-       {
-        "serviceSubset": "baseline",
-        "weight": 100
-       },
-       {
-        "serviceSubset": "canary",
-        "weight": 0
-       }
-      ]
+      "redirect": {
+       "datacenter": "cloud",
+       "service": "my-application"
+      }
      }
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Release",
    "namespaceOverride": "default",
@@ -325,23 +139,23 @@
    "type": "deployManifest"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 90
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 10
        }
       ]
@@ -349,7 +163,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "10% Canary",
    "namespaceOverride": "default",
@@ -390,23 +204,23 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -414,7 +228,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Rollback Canary",
    "namespaceOverride": "default",
@@ -455,7 +269,7 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "completeOtherBranchesThenFail": false,
    "continuePipeline": false,
@@ -465,16 +279,16 @@
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 70
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 30
        }
       ]
@@ -482,7 +296,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "30% Canary",
    "namespaceOverride": "default",
@@ -511,9 +325,9 @@
     "metricsAccountName": "metrics",
     "scopes": [
      {
-      "controlLocation": "default",
+      "controlLocation": "datacenter",
       "controlScope": "baseline",
-      "experimentLocation": "default",
+      "experimentLocation": "cloud",
       "experimentScope": "canary",
       "extendedScopeParams": {},
       "scopeName": "default"
@@ -558,7 +372,7 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "completeOtherBranchesThenFail": false,
    "continuePipeline": false,
@@ -568,16 +382,16 @@
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 50
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 50
        }
       ]
@@ -585,7 +399,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "50% Canary",
    "namespaceOverride": "default",
@@ -614,9 +428,9 @@
     "metricsAccountName": "metrics",
     "scopes": [
      {
-      "controlLocation": "default",
+      "controlLocation": "datacenter",
       "controlScope": "baseline",
-      "experimentLocation": "default",
+      "experimentLocation": "cloud",
       "experimentScope": "canary",
       "extendedScopeParams": {},
       "scopeName": "default"
@@ -661,7 +475,7 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "completeOtherBranchesThenFail": false,
    "continuePipeline": false,
@@ -671,16 +485,16 @@
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 30
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 70
        }
       ]
@@ -688,7 +502,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "70% Canary",
    "namespaceOverride": "default",
@@ -717,9 +531,9 @@
     "metricsAccountName": "metrics",
     "scopes": [
      {
-      "controlLocation": "default",
+      "controlLocation": "datacenter",
       "controlScope": "baseline",
-      "experimentLocation": "default",
+      "experimentLocation": "cloud",
       "experimentScope": "canary",
       "extendedScopeParams": {},
       "scopeName": "default"
@@ -764,7 +578,7 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "completeOtherBranchesThenFail": false,
    "continuePipeline": false,
@@ -774,16 +588,16 @@
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 0
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 100
        }
       ]
@@ -791,7 +605,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "100% Canary",
    "namespaceOverride": "default",
@@ -820,9 +634,9 @@
     "metricsAccountName": "metrics",
     "scopes": [
      {
-      "controlLocation": "default",
+      "controlLocation": "datacenter",
       "controlScope": "baseline",
-      "experimentLocation": "default",
+      "experimentLocation": "cloud",
       "experimentScope": "canary",
       "extendedScopeParams": {},
       "scopeName": "default"
@@ -867,23 +681,6 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
-   "app": "web",
-   "cloudProvider": "kubernetes",
-   "location": "default",
-   "manifestName": "deployment web-canary",
-   "mode": "static",
-   "name": "Delete Canary",
-   "options": {
-    "cascading": true
-   },
-   "refId": "22",
-   "requisiteStageRefIds": [
-    "4"
-   ],
-   "type": "deleteManifest"
-  },
-  {
    "completeOtherBranchesThenFail": false,
    "continuePipeline": false,
    "failPipeline": false,
@@ -905,23 +702,23 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -929,7 +726,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Rollback Canary",
    "namespaceOverride": "default",
@@ -970,23 +767,23 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -994,7 +791,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Rollback Canary",
    "namespaceOverride": "default",
@@ -1035,23 +832,23 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -1059,7 +856,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Rollback Canary",
    "namespaceOverride": "default",
@@ -1100,23 +897,23 @@
    "type": "checkPreconditions"
   },
   {
-   "account": "demo",
+   "account": "eks-spinnaker",
    "cloudProvider": "kubernetes",
    "manifests": [
     {
      "apiVersion": "consul.hashicorp.com/v1alpha1",
      "kind": "ServiceSplitter",
      "metadata": {
-      "name": "web"
+      "name": "my-application"
      },
      "spec": {
       "splits": [
        {
-        "serviceSubset": "baseline",
+        "service": "my-application",
         "weight": 100
        },
        {
-        "serviceSubset": "canary",
+        "service": "my-application-cloud",
         "weight": 0
        }
       ]
@@ -1124,7 +921,7 @@
     }
    ],
    "moniker": {
-    "app": "web"
+    "app": "my-application"
    },
    "name": "Rollback Canary",
    "namespaceOverride": "default",
@@ -1145,5 +942,5 @@
   }
  ],
  "triggers": [],
- "updateTs": "1615235029000"
+ "updateTs": "1620846520000"
 }

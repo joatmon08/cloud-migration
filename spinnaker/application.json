@@ -1,5 +1,5 @@
 {
- "accounts": "demo",
+ "accounts": "eks-spinnaker",
  "cloudProviders": "",
  "dataSources": {
   "disabled": [
@@ -13,8 +13,8 @@
  "email": "7497D899-3D80-4105-9B00-0878F05B857E@mailinator.com",
  "instancePort": 9090,
  "lastModifiedBy": "anonymous",
- "name": "web",
+ "name": "my-application",
  "trafficGuards": [],
- "updateTs": "1613759705000",
+ "updateTs": "1620846490000",
  "user": "[anonymous]"
 }

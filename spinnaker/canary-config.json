@@ -1,6 +1,6 @@
 {
  "applications": [
-  "web"
+  "my-application"
  ],
  "classifier": {
   "groupWeights": {
@@ -37,10 +37,10 @@
    "scopeName": "default"
   }
  ],
- "name": "web-canary",
+ "name": "canary",
  "templates": {
-  "error500": "app=\"web\",envoy_response_code_class=\"5\",release=\"${scope}\",kubernetes_namespace=\"${location}\""
+  "error500": "consul_source_service=\"my-application\",envoy_response_code_class=\"5\",consul_source_datacenter=\"${location}\""
  },
- "updatedTimestamp": 1613759913813,
- "updatedTimestampIso": "2021-02-19T18:38:33.813Z"
+ "updatedTimestamp": 1620846491766,
+ "updatedTimestampIso": "2021-05-12T19:08:11.766Z"
 }

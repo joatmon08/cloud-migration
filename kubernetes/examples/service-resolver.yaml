@@ -1,7 +1,7 @@
 apiVersion: consul.hashicorp.com/v1alpha1
 kind: ServiceResolver
 metadata:
-  name: my-application-cloud
+  name: my-application
 spec:
   redirect:
     service: my-application
