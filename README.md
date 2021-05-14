@@ -1,12 +1,12 @@
 # Cloud Migration with Network Automation & Service Mesh
 
-## Pre-requisites
+## Prerequisites
 
 - [Consul](https://www.consul.io/downloads) v1.9+
 - [Terraform](https://www.terraform.io/downloads.html) v0.14+
-- [Consul Terraform Sync](https://github.com/hashicorp/consul-terraform-sync)
-
-Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joatmon08/listener-rule/aws/latest) Terraform module, which is use by Consul Terraform Sync configuration.
+- [Halyard](https://spinnaker.io/setup/install/halyard/) v1.42.0+
+- [spin CLI](https://spinnaker.io/guides/spin/) v1.22.0+
+- Amazon Web Services
 
 ## Usage
 
@@ -14,12 +14,9 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
 
 1. Go into `cloud` and run `terraform apply`.
 
-1. Go into `datacenter` and update the variable for `enable_peering = true`.
-   Run `terraform apply` to accept the peering connection from cloud.
-
 1. Set `kubectl` to the AWS EKS cluster in cloud.
    ```shell
-   aws eks --region us-west-2 update-kubeconfig --name cloud
+   make kubeconfig
    ```
 
 1. Change directory into `cloud-deployments`.
@@ -32,66 +29,58 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
    cp credentials.example credentials
    ```
 
-1. In `credentials`, add the AWS role ARN and the Kubernetes context for EKS clusters.
+1. In `credentials`, add the AWS role ARN, the Kubernetes context for EKS clusters.
+
+1. Then, set the environment variables with the Terraform variables.
+   ```shell
+   source credentials
+   ```
 
 1. Deploy Consul Helm chart, ingress gateway configuration, and application to Kubernetes.
    ```shell
-   terraform apply -var-file=credentials
+   terraform apply
    ```
 
-1. Change directory into `datacenter`.
+1. Go to the top-level directory.
    ```shell
-   cd datacenter
+   cd ..
    ```
 
-1. Get the Terraform outputs, including the load balancer, target groups, and VPC ID.
-   Copy the values, you will need them for `canary/datacenter.module.tfvars`.
+1. Retrieve the parameters for adding `datacenter` as a secondary datacenter. This includes
+   certificates, certificate authority, and encryption key.
    ```shell
-   terraform output
+   make federate
    ```
 
-1. Go into `canary`.
+1. The `datacenter` directory should contain a `credentials.auto.tfvars`. You need to set the variables in
+   Terraform to the content of this file.
    ```shell
-   cd canary
+   datacenter/credentials.auto.tfvars
    ```
 
-1. Copy `datacenter.module.tfvars.example` to `datacenter.module.tfvars`.
+1. Go into `datacenter` and update the variable for `enable_peering = true`.
+   Run `terraform apply` to accept the peering connection from cloud and reconfigure
+   `datacenter` to federate with `cloud`, the primary datacenter.
+
+1. Configure and create Spinnaker.
    ```shell
-   cp datacenter.module.tfvars.example datacenter.module.tfvars
+   make spinnaker-deploy
    ```
 
-1. Paste the Terraform outputs, including load balancer, target groups, and VPC ID.
+1. Run `hal deploy connect` to access Spinnaker UI on [http://localhost:9000](http://localhost:9000)
+   and port forward the Spinnaker API.
 
-1. Copy `credentials.example` to `credentials`.
+1. Configure and create Spinnaker pipelines.
    ```shell
-   cp credentials.example credentials
+   make spinnaker-pipelines
    ```
 
-1. In `credentials`, add the AWS secrets and role assumption information.
+## Accessing Spinnaker, Consul, and Grafana
 
-1. Deploy Consul Terraform Sync to Kubernetes.
-   ```shell
-   terraform apply -var-file=credentials
-   ```
-
-1. To verify everything is working, get the load balancer's DNS and issue
-   an HTTP GET request with the `Host` header set to `my-application.my-company.net`.
-   ```shell
-   curl -H 'Host:my-application.my-company.net' my-application-1971614036.us-east-2.elb.amazonaws.com
-   ```
+- Run `kubectl port-forward services/grafana 3000:80` to access Grafana on [http://localhost:3000](http://localhost:3000). (username `admin`, password `password`)
+- Run `kubectl port-forward services/consul-ui 8501:443` to access Consul on [https://localhost:8501](http://localhost:8501).
 
 ## Caveats
 
 - In this demo, the "cloud" application is hosted on Kubernetes (for ease of deployment).
-
-- The ALB mimics a datacenter load balancer.
-
 - The configuration peers two VPCs in two different regions.
-
-- You would ideally configure your Kubernetes pod with an AWS IAM role
-  for configuring a load balancer. To abstract away as many AWS constructs as possible,
-  this demo passes the credentials to CTS directly to mimic the passing of any
-  provider credentials.
-
-- Consul Terraform Sync is deployed to Kubernetes so that the daemon continuously
-  runs. It uses a Docker image built by `canary/Dockerfile`.

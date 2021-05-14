@@ -26,7 +26,7 @@ resource "aws_instance" "consul_server" {
     consul_key_file    = var.consul_key_file
     consul_ca_file     = var.consul_ca_file
     consul_encrypt_key = var.consul_encrypt_key
-    primary_gateway    = var.primary_gateway
+    primary_gateway    = var.consul_primary_gateway
   })
 
   tags = merge({ "Name" = "consul-server" }, local.tags)

@@ -68,7 +68,7 @@ variable "consul_encrypt_key" {
   sensitive   = true
 }
 
-variable "primary_gateway" {
+variable "consul_primary_gateway" {
   type        = string
   description = "Consul primary mesh gateway from Kubernetes"
   default     = ""
