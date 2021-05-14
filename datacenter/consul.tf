@@ -17,7 +17,7 @@ resource "aws_instance" "consul_server" {
 
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_id              = module.vpc.public_subnets[0]
-  key_name               = "rosemary"
+  key_name               = var.key_name
 
   user_data = templatefile("${path.module}/templates/consul_server.tpl", {
     dc                 = var.datacenter

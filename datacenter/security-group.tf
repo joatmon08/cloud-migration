@@ -20,6 +20,17 @@ resource "aws_security_group_rule" "listener" {
   description       = "Allow connection from client to load balancer"
 }
 
+resource "aws_security_group_rule" "ssh" {
+  provider          = aws.datacenter
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = [var.client_ip_address]
+  security_group_id = module.vpc.default_security_group_id
+  description       = "Allow SSH connection from client"
+}
+
 resource "aws_security_group_rule" "consul" {
   count             = var.enable_peering ? 1 : 0
   provider          = aws.datacenter

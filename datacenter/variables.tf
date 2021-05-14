@@ -74,6 +74,12 @@ variable "primary_gateway" {
   default     = ""
 }
 
+variable "key_name" {
+  type        = string
+  description = "SSH key name"
+  default     = ""
+}
+
 locals {
   tags = {
     Terraform   = "true"

@@ -6,6 +6,7 @@ resource "aws_instance" "ui" {
   provider      = aws.datacenter
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t2.micro"
+  key_name      = var.key_name
 
   vpc_security_group_ids      = [module.vpc.default_security_group_id]
   subnet_id                   = module.vpc.private_subnets[0]
