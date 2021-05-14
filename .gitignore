@@ -6,4 +6,9 @@ credentials
 credentials.auto.tfvars
 canary/datacenter.module.tfvars
 
+datacenter/consul_cert_file
+datacenter/consul_key_file
+datacenter/consul_ca_file
+datacenter/primary_gateway
+
 *.pem

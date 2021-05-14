@@ -39,3 +39,9 @@ variable "consul_datacenter_address" {
   type        = string
   description = "Consul datacenter address"
 }
+
+variable "consul_encrypt_key" {
+  type        = string
+  description = "Consul gossip encryption key. Create using `consul keygen`"
+  sensitive   = true
+}
