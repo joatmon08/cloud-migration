@@ -23,7 +23,7 @@ module "eks" {
     aws = aws.cloud
   }
   source           = "terraform-aws-modules/eks/aws"
-  version          = "14.0.0"
+  version          = "16.0.0"
   cluster_name     = var.datacenter
   cluster_version  = "1.18"
   subnets          = module.vpc.private_subnets
