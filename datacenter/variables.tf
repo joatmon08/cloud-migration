@@ -13,11 +13,6 @@ variable "environment" {
   description = "environment"
 }
 
-variable "role_arn" {
-  type        = string
-  description = "Role ARN for provider to assume"
-}
-
 variable "cloud_region" {
   type        = string
   description = "AWS region for peering connections to cloud"
