@@ -49,7 +49,7 @@ service {
 
 task {
   name        = "canary"
-  description = "send canary traffic to my-application in datacenter cloud"
+  description = "send canary traffic to my-application in datacenter or ingress gateway in cloud"
   providers   = ["aws"]
   services    = ["ingress-gateway", "my-application"]
   source      = "joatmon08/listenerrule-nia/aws"
