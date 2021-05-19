@@ -1,3 +1,0 @@
-blue_target_group_arn = "arn:aws:elasticloadbalancing:us-east-2:${ACCOUNT}:targetgroup/my-application-datacenter/"
-listener_arn          = "arn:aws:elasticloadbalancing:us-east-2:${ACCOUNT}:listener/app/my-application/"
-vpc_id                = "${VPC_ID}"

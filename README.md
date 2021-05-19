@@ -10,6 +10,8 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
 
 ## Usage
 
+### Set up datacenter and cloud deployments
+
 1. Go into `datacenter` and run `terraform apply`.
 
 1. Go into `cloud` and run `terraform apply`.
@@ -17,9 +19,17 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
 1. Go into `datacenter` and update the variable for `enable_peering = true`.
    Run `terraform apply` to accept the peering connection from cloud.
 
-1. Set `kubectl` to the AWS EKS cluster in cloud.
+### Deploy Consul and example workload
+
+1. Go to the top-level of this repository.
    ```shell
-   aws eks --region us-west-2 update-kubeconfig --name cloud
+   cd ..
+   ```
+
+1. Set the `kubeconfig` to the AWS EKS cluster in cloud. Make sure
+   you are logged into AWS.
+   ```shell
+   make kubeconfig
    ```
 
 1. Change directory into `cloud-deployments`.
@@ -32,52 +42,50 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
    cp credentials.example credentials
    ```
 
-1. In `credentials`, add the AWS role ARN and the Kubernetes context for EKS clusters.
+1. In `credentials`, add the AWS role ARN. The Kubernetes context for Terraform
+   will use the current context you set as part of the previous steps.
+
+
+1. Source the `credentials` file to set the variables for Terraform.
+   ```shell
+   source credentials
+   ```
 
 1. Deploy Consul Helm chart, ingress gateway configuration, and application to Kubernetes.
    ```shell
-   terraform apply -var-file=credentials
+   terraform apply
    ```
 
-1. Change directory into `datacenter`.
+### Run Consul Terraform Sync to update ALB based on Consul service
+
+1. Go to the top-level of this repository.
    ```shell
-   cd datacenter
+   cd ..
    ```
 
-1. Get the Terraform outputs, including the load balancer, target groups, and VPC ID.
-   Copy the values, you will need them for `canary/datacenter.module.tfvars`.
+1. Generate variables for Consul Terraform Sync to use in its module and save
+   them in `canary/datacenter.modules.tfvars`. This includes an ALB, listener rule,
+   and target group created by the `datacenter` Terraform configuration.
    ```shell
-   terraform output
+   make consul_terraform_sync_variable
    ```
 
-1. Go into `canary`.
+1. Change directory to `canary`.
    ```shell
    cd canary
    ```
 
-1. Copy `datacenter.module.tfvars.example` to `datacenter.module.tfvars`.
+## Test it out
+
+1. Go to the top-level of this repository.
    ```shell
-   cp datacenter.module.tfvars.example datacenter.module.tfvars
-   ```
-
-1. Paste the Terraform outputs, including load balancer, target groups, and VPC ID.
-
-1. Copy `credentials.example` to `credentials`.
-   ```shell
-   cp credentials.example credentials
-   ```
-
-1. In `credentials`, add the AWS secrets and role assumption information.
-
-1. Deploy Consul Terraform Sync to Kubernetes.
-   ```shell
-   terraform apply -var-file=credentials
+   cd ..
    ```
 
 1. To verify everything is working, get the load balancer's DNS and issue
    an HTTP GET request with the `Host` header set to `my-application.my-company.net`.
    ```shell
-   curl -H 'Host:my-application.my-company.net' my-application-1971614036.us-east-2.elb.amazonaws.com
+   make test
    ```
 
 ## Caveats

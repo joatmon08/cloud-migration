@@ -33,7 +33,9 @@ module "vpc" {
   enable_nat_gateway = true
   single_nat_gateway = false
 
-  tags = local.tags
+  private_subnet_tags = { "kubernetes.io/cluster/${var.datacenter}" = "shared" }
+  public_subnet_tags  = { "kubernetes.io/cluster/${var.datacenter}" = "shared" }
+  tags                = local.tags
 }
 
 resource "aws_vpc_peering_connection" "datacenter" {

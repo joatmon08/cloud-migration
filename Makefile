@@ -3,3 +3,6 @@ kubeconfig:
 
 consul_terraform_sync_variables:
 	bash generate_cts_variables.sh
+
+test:
+	curl -H 'Host:my-application.my-company.net' $(shell cd datacenter && terraform output -raw alb_dns_name)
