@@ -17,3 +17,7 @@ output "public_subnet_ids" {
 output "private_subnet_ids" {
   value = module.vpc.private_subnets
 }
+
+output "alb_dns_name" {
+  value = aws_lb.app.dns_name
+}
