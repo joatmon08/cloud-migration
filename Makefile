@@ -25,6 +25,6 @@ load-test:
 	k6 run -e UI_ENDPOINT=http://$(shell cd datacenter && terraform output -raw ui_endpoint) k6/script.js --duration 120m
 
 clean:
-	bash shutdown.sh || true
-	kubectl delete -f kubernetes/
+	kubectl delete -f kubernetes/ --ignore-not-found
 	rm -f *consul*.pem
+	rm -f datacenter/credentials.auto.tfvars
