@@ -2,6 +2,7 @@ canary/*.module.tfvars
 canary/terraform
 canary/sync-tasks
 canary/consul-terraform-sync
+canary/config.local.hcl.bak
 credentials
 credentials.auto.tfvars
 canary/datacenter.module.tfvars

@@ -13,12 +13,13 @@ buffer_period {
 }
 
 consul {
-  address = "CONSUL_HTTP_ADDR"
+  address = "ab0fa0d31d73b48f287052f751c2111a-1910204537.us-west-2.elb.amazonaws.com"
 }
 
 driver "terraform" {
   log         = true
   persist_log = true
+  version     = "0.14.11"
 
   required_providers {
     aws = {
@@ -43,7 +44,7 @@ service {
   datacenter  = "cloud"
   description = "all instances of the service my-application in datacenter cloud"
   cts_user_defined_meta = {
-    host   = "my-application.my-company.net"
+    host = "my-application.my-company.net"
   }
 }
 

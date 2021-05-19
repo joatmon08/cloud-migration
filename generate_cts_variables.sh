@@ -10,6 +10,8 @@ listener_arn          = "${LISTENER_ARN}"
 vpc_id                = "${VPC_ID}"
 EOF
 
-CONSUL_HTTP_ADDR=$(shell kubectl get services/consul-ui -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+CONSUL_HTTP_ADDR=$(kubectl get services/consul-ui -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+DIR=$(pwd)
 
-sed -i 's/CONSUL_HTTP_ADDR/'"${CONSUL_HTTP_ADDR}"'/g' canary/config.local.hcl
+sed -i.bak "s/CONSUL_HTTP_ADDR/${CONSUL_HTTP_ADDR}/g" canary/config.local.hcl
+sed -i.bak 's:PWD:'`pwd`':' canary/config.local.hcl
