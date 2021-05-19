@@ -13,7 +13,7 @@ buffer_period {
 }
 
 consul {
-  address = "127.0.0.1:8500"
+  address = "CONSUL_HTTP_ADDR"
 }
 
 driver "terraform" {

@@ -9,3 +9,7 @@ blue_target_group_arn = "${TARGET_GROUP_ARN}"
 listener_arn          = "${LISTENER_ARN}"
 vpc_id                = "${VPC_ID}"
 EOF
+
+CONSUL_HTTP_ADDR=$(shell kubectl get services/consul-ui -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+sed -i 's/CONSUL_HTTP_ADDR/'"${CONSUL_HTTP_ADDR}"'/g' canary/config.local.hcl
