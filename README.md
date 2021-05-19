@@ -65,16 +65,16 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
 
 1. Generate variables for Consul Terraform Sync to use in its module and save
    them in `canary/datacenter.modules.tfvars`. This includes an ALB, listener rule,
-   and target group created by the `datacenter` Terraform configuration.
+   and target group created by the `datacenter` Terraform configuration. It also
+   updates `config.local.hcl` with the Consul UI load balancer endpoint.
    ```shell
-   make consul_terraform_sync_variable
+   make consul_terraform_sync_variables
    ```
 
-1. Change directory to `canary`.
+1. Run Consul Terraform Sync.
    ```shell
-   cd canary
+   make consul_terraform_sync
    ```
-
 ## Test it out
 
 1. Go to the top-level of this repository.
@@ -87,6 +87,21 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
    ```shell
    make test
    ```
+
+## Clean up
+
+1. Clean up CTS and the Consul deployment to Kubernetes.
+   ```shell
+   make clean
+   ```
+
+1. Go into `cloud`.
+
+1. Run a `terraform destroy` for `cloud`.
+
+1. Go into `datacenter` and update the variable for `enable_peering = false`.
+
+1. Run `terraform destroy` for `datacenter`.
 
 ## Caveats
 

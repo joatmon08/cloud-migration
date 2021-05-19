@@ -13,7 +13,7 @@ buffer_period {
 }
 
 consul {
-  address = "ab0fa0d31d73b48f287052f751c2111a-1910204537.us-west-2.elb.amazonaws.com"
+  address = "CONSUL_HTTP_ADDR"
 }
 
 driver "terraform" {
@@ -56,7 +56,7 @@ task {
   source      = "joatmon08/listenerrule-nia/aws"
   version     = "0.2.1"
   variable_files = [
-    "/Users/rosemarywang/demos/cloud-migration/canary/datacenter.module.tfvars",
-    "/Users/rosemarywang/demos/cloud-migration/canary/service.tfvars"
+    "PWD/canary/datacenter.module.tfvars",
+    "PWD/canary/service.tfvars"
   ]
 }
