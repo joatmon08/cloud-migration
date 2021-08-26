@@ -67,7 +67,7 @@ ca_file = "/etc/consul/certs/consul-agent-ca.pem"
 %{ endif }
 
 verify_incoming_rpc    = true
-verify_outgoing        = true
+verify_outgoing        = %{ if primary_gateway != "" }true%{ else }false%{ endif }
 verify_server_hostname = true
 
 encrypt = "${consul_encrypt_key}"
@@ -93,6 +93,12 @@ connect {
 }
 
 datacenter = "${dc}"
+
+acl {
+  enabled        = true
+  default_policy = "deny"
+  down_policy    = "extend-cache"
+}
 
 telemetry {
   prometheus_retention_time = "24h"
