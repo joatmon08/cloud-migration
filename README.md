@@ -2,91 +2,109 @@
 
 ## Pre-requisites
 
-- [Consul](https://www.consul.io/downloads) v1.9+
-- [Terraform](https://www.terraform.io/downloads.html) v0.14+
+- [Consul](https://www.consul.io/downloads) v1.10+
+- [Terraform](https://www.terraform.io/downloads.html) v1.0+
+- [Terraform Cloud](https://app.terraform.io/signup/account?utm_source=terraform_io&utm_content=terraform_cloud_hero)
 - [Consul Terraform Sync](https://github.com/hashicorp/consul-terraform-sync)
 
-Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joatmon08/listener-rule/aws/latest) Terraform module, which is use by Consul Terraform Sync configuration.
+Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joatmon08/listener-rule/aws/latest)
+Terraform module, which is use by Consul Terraform Sync configuration.
+
+This repository uses Terraform Cloud to store infrastructure state.
+
+To set it up:
+
+1. Fork this repository.
+1. Create 4 workspaces.
+   1. `datacenter`
+   1. `k8s-cloud`
+   1. `consul`
+   1. `application`
+1. Connect the workspace with VCS workflow to your fork and set their working directories.
+   1. `datacenter`: working directory is `datacenter`
+   1. `k8s-cloud`: working directory is `cloud`
+   1. `consul`: working directory is `consul`
+   1. `application`: working directory is `application`
+1. Add AWS credentials as sensitive environment variables to each workspace.
+1. Define two variables in `datacenter`:
+   1. `client_ip_address`: `<insert your public ip>/32`
+   1. `enable_peering`: `false`
 
 ## Usage
 
+### Set up regions and variables.
+
+1. In each directory, you'll find a `terraform.auto.tfvars`.
+
+1. By default, we set the following regions. You can change these,
+   but you must change them across all files.
+   - `datacenter` (VM): `us-east-2`
+   - `cloud` (Kubernetes): `us-west-2`
+
 ### Set up datacenter and cloud deployments
 
-1. Go into `datacenter` and run `terraform apply`.
+1. Start a new run and apply changes to the `datacenter` workspace.
 
-1. Go into `cloud` and run `terraform apply`.
+1. Start a new run and apply changes to the `cloud` workspace.
 
-1. Go into `datacenter` and update the variable for `enable_peering = true`.
-   Run `terraform apply` to accept the peering connection from cloud.
+1. Go into `datacenter` workspace.
+   1. Update the variable to set `enable_peering = true`. This sets up VPC peering
+      between `cloud` and `datacenter` environments.
+   1. Start a new run and apply changes to the `datacenter` workspace.
 
 ### Deploy Consul and example workload
 
-1. Go to the top-level of this repository.
-   ```shell
-   cd ..
-   ```
+1. Start a new run for the `consul` workspace.
 
-1. Set the `kubeconfig` to the AWS EKS cluster in cloud. Make sure
-   you are logged into AWS.
-   ```shell
-   make kubeconfig
-   ```
-
-1. Change directory into `cloud-deployments`.
-   ```shell
-   cd cloud-deployments
-   ```
-
-1. Copy `credentials.example` to `credentials`.
-   ```shell
-   cp credentials.example credentials
-   ```
-
-1. In `credentials`, add the AWS role ARN. The Kubernetes context for Terraform
-   will use the current context you set as part of the previous steps.
-
-
-1. Source the `credentials` file to set the variables for Terraform.
-   ```shell
-   source credentials
-   ```
-
-1. Deploy Consul Helm chart, ingress gateway configuration, and application to Kubernetes.
-   ```shell
-   terraform apply
-   ```
+1. Start a new run for the `application` workspace.
 
 ### Run Consul Terraform Sync to update ALB based on Consul service
 
-1. Go to the top-level of this repository.
-   ```shell
-   cd ..
-   ```
-
 1. Generate variables for Consul Terraform Sync to use in its module and save
-   them in `canary/datacenter.modules.tfvars`. This includes an ALB, listener rule,
+   them in `consul_terraform_sync/datacenter.modules.tfvars`. This includes an ALB, listener rule,
    and target group created by the `datacenter` Terraform configuration. It also
    updates `config.local.hcl` with the Consul UI load balancer endpoint.
    ```shell
-   make consul_terraform_sync_variables
+   make cts_variables
    ```
 
 1. Run Consul Terraform Sync.
    ```shell
-   make consul_terraform_sync
+   make cts
    ```
 ## Test it out
 
-1. Go to the top-level of this repository.
-   ```shell
-   cd ..
-   ```
-
 1. To verify everything is working, get the load balancer's DNS and issue
    an HTTP GET request with the `Host` header set to `my-application.my-company.net`.
+   The request should go to `datacenter`.
    ```shell
-   make test
+   $ make test
+
+   {
+      "name": "my-application (datacenter)",
+      "uri": "/",
+      "type": "HTTP",
+      "ip_addresses": [
+         "172.25.16.8"
+      ],
+      "start_time": "2021-08-26T16:43:12.552603",
+      "end_time": "2021-08-26T16:43:12.552681",
+      "duration": "77.835µs",
+      "body": "my-application (datacenter)",
+      "code": 200
+   }
    ```
+
+1. You can update the deployment to send a percentage of traffic to
+   the `cloud` instances of `my-application.
+   ```shell
+   $ kubectl edit deployment my-application
+
+   # update annotation - consul.hashicorp.com/service-meta-weight: "50"
+   ```
+
+1. CTS will pick up the change from the service metadata and update the
+   ALB listener to send 50% of traffic to `cloud`.
 
 ## Clean up
 
@@ -95,13 +113,11 @@ Check out the [AWS ALB Listener Rule](https://registry.terraform.io/modules/joat
    make clean
    ```
 
-1. Go into `cloud`.
-
-1. Run a `terraform destroy` for `cloud`.
-
-1. Go into `datacenter` and update the variable for `enable_peering = false`.
-
-1. Run `terraform destroy` for `datacenter`.
+1. Go into Terraform Cloud and queue a destroy in the following order.
+   1. `application`
+   1. `consul`
+   1. `cloud`
+   1. `datacenter`
 
 ## Caveats
 

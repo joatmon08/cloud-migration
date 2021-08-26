@@ -13,18 +13,18 @@ buffer_period {
 }
 
 consul {
-  address = "CONSUL_HTTP_ADDR"
+  address = "ab49b822e3f5d46f4957a01dbe376bf1-1851028653.us-west-2.elb.amazonaws.com"
 }
 
 driver "terraform" {
   log         = true
   persist_log = true
-  version     = "0.14.11"
+  version     = "1.0.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>3.23"
+      version = "~>3.55"
     }
   }
   backend "consul" {
@@ -54,9 +54,9 @@ task {
   providers   = ["aws"]
   services    = ["ingress-gateway", "my-application"]
   source      = "joatmon08/listenerrule-nia/aws"
-  version     = "0.2.1"
+  version     = "0.3.0"
   variable_files = [
-    "PWD/canary/datacenter.module.tfvars",
-    "PWD/canary/service.tfvars"
+    "/Users/rosemarywang/demos/cloud-migration/consul_terraform_sync/datacenter.module.tfvars",
+    "/Users/rosemarywang/demos/cloud-migration/consul_terraform_sync/service.tfvars"
   ]
 }
