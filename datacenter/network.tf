@@ -12,7 +12,7 @@ module "vpc" {
     aws = aws.datacenter
   }
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~>2.64"
+  version = "3.6.0"
 
   name = var.datacenter
   cidr = "172.25.16.0/24"
@@ -21,10 +21,8 @@ module "vpc" {
   private_subnets = ["172.25.16.0/28", "172.25.16.16/28"]
   public_subnets  = ["172.25.16.208/28", "172.25.16.224/28"]
 
-
-  # azs             = slice(data.aws_availability_zones.available.names, 0, 3)
-  # private_subnets = ["172.25.16.0/28", "172.25.16.16/28", "172.25.16.32/28"]
-  # public_subnets  = ["172.25.16.208/28", "172.25.16.224/28", "172.25.16.240/28"]
+  manage_default_route_table = true
+  default_route_table_tags   = { DefaultRouteTable = true }
 
   enable_nat_gateway = true
   single_nat_gateway = false

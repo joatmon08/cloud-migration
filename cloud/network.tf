@@ -21,7 +21,7 @@ module "vpc" {
     aws = aws.cloud
   }
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~>2.64"
+  version = "3.6.0"
 
   name = var.datacenter
   cidr = "10.0.1.0/24"
@@ -30,8 +30,14 @@ module "vpc" {
   private_subnets = ["10.0.1.0/28", "10.0.1.16/28", "10.0.1.32/28"]
   public_subnets  = ["10.0.1.208/28", "10.0.1.224/28", "10.0.1.240/28"]
 
+  manage_default_route_table = true
+  default_route_table_tags   = { DefaultRouteTable = true }
+
   enable_nat_gateway = true
   single_nat_gateway = false
+
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   private_subnet_tags = { "kubernetes.io/cluster/${var.datacenter}" = "shared" }
   public_subnet_tags  = { "kubernetes.io/cluster/${var.datacenter}" = "shared" }

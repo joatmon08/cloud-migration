@@ -23,16 +23,13 @@ module "eks" {
     aws = aws.cloud
   }
   source           = "terraform-aws-modules/eks/aws"
-  version          = "16.0.0"
+  version          = "17.3.0"
   cluster_name     = var.datacenter
-  cluster_version  = "1.18"
+  cluster_version  = "1.19"
   subnets          = module.vpc.private_subnets
+
+  vpc_id           = module.vpc.vpc_id
   write_kubeconfig = false
-  manage_aws_auth  = false
-
-  tags = local.tags
-
-  vpc_id = module.vpc.vpc_id
 
   node_groups_defaults = {
     ami_type  = "AL2_x86_64"
@@ -40,16 +37,13 @@ module "eks" {
   }
 
   node_groups = {
-    application = {
+    primary = {
       desired_capacity = 3
       max_capacity     = 3
       min_capacity     = 3
 
-      instance_type = "t2.small"
-      k8s_labels    = local.tags
+      instance_types            = ["t2.small"]
+      k8s_labels                = local.tags
     }
   }
 }
-
-## Need to run: kubectl set env daemonset -n kube-system aws-node AWS_VPC_K8S_CNI_EXTERNALSNAT=true
-## See https://docs.aws.amazon.com/eks/latest/userguide/external-snat.html

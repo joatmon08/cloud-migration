@@ -27,7 +27,7 @@ variable "enable_peering" {
 variable "fake_service_version" {
   type        = string
   description = "version of fake service"
-  default     = "0.19.1"
+  default     = "0.22.7"
 }
 
 variable "application_name" {

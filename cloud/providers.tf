@@ -3,11 +3,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>3.23"
+      version = "~>3.55"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~>2.0"
+      version = "~>2.4"
     }
   }
 }
@@ -15,19 +15,9 @@ terraform {
 provider "aws" {
   alias  = "datacenter"
   region = var.datacenter_region
-  assume_role {
-    role_arn     = var.role_arn
-    session_name = "terraform"
-    external_id  = "terraform"
-  }
 }
 
 provider "aws" {
   alias  = "cloud"
   region = var.region
-  assume_role {
-    role_arn     = var.role_arn
-    session_name = "terraform"
-    external_id  = "terraform"
-  }
 }
