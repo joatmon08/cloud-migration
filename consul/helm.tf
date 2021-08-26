@@ -1,7 +1,9 @@
 resource "helm_release" "consul" {
   name = "consul"
 
-  chart = "https://github.com/hashicorp/consul-helm/archive/${var.consul_helm_version}.tar.gz"
+  repository = "https://helm.releases.hashicorp.com"
+  chart      = "consul"
+  version    = var.consul_helm_version
 
   values = [
     templatefile("templates/consul.tpl", {
