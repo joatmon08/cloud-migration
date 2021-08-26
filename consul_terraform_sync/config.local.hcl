@@ -8,8 +8,8 @@ syslog {
 
 buffer_period {
   enabled = true
-  min     = "5s"
-  max     = "20s"
+  min     = "20s"
+  max     = "30s"
 }
 
 consul {

@@ -116,7 +116,7 @@ To set it up:
 1. Go into Terraform Cloud and queue a destroy in the following order.
    1. `application`
    1. `consul`
-   1. `cloud`
+   1. `k8s-cloud`
    1. `datacenter`
 
 ## Caveats

@@ -67,10 +67,12 @@ ca_file = "/etc/consul/certs/consul-agent-ca.pem"
 %{ endif }
 
 verify_incoming_rpc    = true
-verify_outgoing        = %{ if primary_gateway != "" }true%{ else }false%{ endif }
+verify_outgoing        = true
 verify_server_hostname = true
 
-encrypt = "${consul_encrypt_key}"
+encrypt                 = "${consul_encrypt_key}"
+encrypt_verify_incoming = true
+encrypt_verify_outgoing = true
 
 ports {
   https = 8501
