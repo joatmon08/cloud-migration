@@ -22,11 +22,11 @@ module "eks" {
   providers = {
     aws = aws.cloud
   }
-  source           = "terraform-aws-modules/eks/aws"
-  version          = "17.3.0"
-  cluster_name     = var.datacenter
-  cluster_version  = "1.19"
-  subnets          = module.vpc.private_subnets
+  source          = "terraform-aws-modules/eks/aws"
+  version         = "17.3.0"
+  cluster_name    = var.datacenter
+  cluster_version = "1.19"
+  subnets         = module.vpc.private_subnets
 
   vpc_id           = module.vpc.vpc_id
   write_kubeconfig = false
@@ -42,8 +42,8 @@ module "eks" {
       max_capacity     = 3
       min_capacity     = 3
 
-      instance_types            = ["t2.small"]
-      k8s_labels                = local.tags
+      instance_types = ["t2.small"]
+      k8s_labels     = local.tags
     }
   }
 }
