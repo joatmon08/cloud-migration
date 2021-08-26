@@ -48,3 +48,42 @@ locals {
     Datacenter  = var.datacenter
   }
 }
+
+variable "consul_cert_file" {
+  type        = string
+  description = "Consul datacenter certificate contents, base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "consul_key_file" {
+  type        = string
+  description = "Consul datacenter certificate key file contents, base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "consul_ca_file" {
+  type        = string
+  description = "Consul datacenter certificate authority base64 encoded"
+  sensitive   = true
+  default     = ""
+}
+
+variable "consul_encrypt_key" {
+  type        = string
+  description = "Consul gossip encryption key"
+  sensitive   = true
+}
+
+variable "consul_primary_gateway" {
+  type        = string
+  description = "Consul primary mesh gateway from Kubernetes. Add to enable mesh federation."
+  default     = ""
+}
+
+variable "key_name" {
+  type        = string
+  description = "SSH key name"
+  default     = ""
+}
