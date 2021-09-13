@@ -3,8 +3,9 @@ consul_terraform_sync/terraform
 consul_terraform_sync/sync-tasks
 consul_terraform_sync/consul-terraform-sync
 consul_terraform_sync/config.local.hcl.bak
-secrets.tfvars
 consul_terraform_sync/datacenter.module.tfvars
-modules/boundary-deployment/bin/id_rsa
+
 *.pem
+secrets.tfvars
 datacenter/certs
+consul_acl_bootstrap.json

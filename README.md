@@ -43,7 +43,15 @@ To set it up:
 
 ### Set up datacenter and cloud deployments
 
+1. Set up Consul security configurations, including gossip encryption, certificates, and ACLs.
+   1. Run `make consul_certs` to create certificates for the `datacenter` Consul server.
+   1. Run `make consul_secrets` to generate the Terraform variables for gossip encryption and certificates.
+   1. Copy the variables from `datacenter/secrets.tfvars` into the `datacenter` workspace, marking as sensitive.
+
 1. Start a new run and apply changes to the `datacenter` workspace.
+
+1. Bootstrap Consul ACLs by running `make consul_acl_bootstrap`. This will save the root management token
+   in `consul_acl_bootstrap.json`.
 
 1. Start a new run and apply changes to the `cloud` workspace.
 
