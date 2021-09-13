@@ -9,8 +9,18 @@ terraform {
       source  = "hashicorp/helm"
       version = "~>2.0"
     }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.15"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.4"
+    }
   }
 }
+
+provider "hcp" {}
 
 provider "aws" {
   region = var.region
@@ -30,4 +40,10 @@ provider "helm" {
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
     token                  = data.aws_eks_cluster_auth.cluster.token
   }
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }

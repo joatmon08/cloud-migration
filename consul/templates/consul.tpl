@@ -17,9 +17,6 @@ ui:
   service:
     type: LoadBalancer
 
-controller:
-  enabled: true
-
 ingressGateways:
   enabled: true
   gateways:
@@ -30,9 +27,3 @@ ingressGateways:
         ports:
           - port: 9090
             nodePort: 30909
-
-terminatingGateways:
-  enabled: true
-  gateways:
-    - name: terminating-gateway
-      replicas: 1
