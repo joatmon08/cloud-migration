@@ -18,6 +18,12 @@ variable "environment" {
   description = "environment"
 }
 
+variable "hvn_cidr_block" {
+  type        = string
+  description = "CIDR block for HCP network"
+  default     = "10.2.0.0/20"
+}
+
 locals {
   tags = {
     Terraform   = "true"

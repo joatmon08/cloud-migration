@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~>2.4"
     }
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.15"
+    }
   }
 }
 
@@ -21,3 +25,5 @@ provider "aws" {
   alias  = "cloud"
   region = var.region
 }
+
+provider "hcp" {}
