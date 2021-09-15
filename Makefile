@@ -20,6 +20,9 @@ cts_variables:
 cts:
 	cd consul_terraform_sync && consul-terraform-sync -config-file config.local.hcl
 
+weight:
+	kubectl patch deployment my-application --type='json' -p='[{"op": "replace", "path": "/spec/template/metadata/annotations/consul.hashicorp.com~1service-meta-weight", "value":"0"}]'
+
 test:
 	curl -H 'Host:my-application.my-company.net' $(shell cd datacenter && terraform output -raw alb_dns_name)
 

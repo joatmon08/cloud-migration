@@ -1,4 +1,4 @@
-log_level = "INFO"
+log_level = "ERR"
 
 port = 8558
 
@@ -13,18 +13,17 @@ buffer_period {
 }
 
 consul {
-  address = "ab49b822e3f5d46f4957a01dbe376bf1-1851028653.us-west-2.elb.amazonaws.com"
+  address = "a9a3227b45e324f95a0e5a98d82a5ca2-926179250.us-west-2.elb.amazonaws.com"
 }
 
 driver "terraform" {
   log         = true
-  persist_log = true
   version     = "1.0.0"
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>3.55"
+      version = "~>3.58"
     }
   }
   backend "consul" {
