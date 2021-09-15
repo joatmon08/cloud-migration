@@ -33,7 +33,7 @@ driver "terraform" {
 }
 
 terraform_provider "aws" {
-  region     = "us-east-2"
+  region     = "us-east-1"
   access_key = "{{ env \"AWS_ACCESS_KEY_ID\" }}"
   secret_key = "{{ env \"AWS_SECRET_ACCESS_KEY\" }}"
   token      = "{{ env \"AWS_SESSION_TOKEN\" }}"

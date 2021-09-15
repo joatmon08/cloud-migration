@@ -38,7 +38,7 @@ To set it up:
 
 1. By default, we set the following regions. You can change these,
    but you must change them across all files.
-   - `datacenter` (VM): `us-east-2`
+   - `datacenter` (VM): `us-east-1`
    - `cloud` (Kubernetes): `us-west-2`
 
 ### Set up datacenter and cloud deployments
