@@ -18,6 +18,12 @@ variable "environment" {
   description = "environment"
 }
 
+variable "hcp_consul_enable" {
+  type        = bool
+  description = "Deploy Consul to use HCP Consul"
+  default     = false
+}
+
 variable "hvn_cidr_block" {
   type        = string
   description = "CIDR block for HCP network"

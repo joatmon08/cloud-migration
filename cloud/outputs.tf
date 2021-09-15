@@ -1,7 +1,7 @@
 output "hcp_consul_cluster" {
-  value = module.hcp.hcp_consul_id
+  value = var.hcp_consul_enable ? module.hcp.0.hcp_consul_id : ""
 }
 
 output "hcp_consul_private_address" {
-  value = module.hcp.hcp_consul_private_endpoint
+  value = var.hcp_consul_enable ? module.hcp.0.hcp_consul_private_endpoint : ""
 }

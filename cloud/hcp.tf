@@ -1,4 +1,5 @@
 module "hcp" {
+  count  = var.hcp_consul_enable ? 1 : 0
   source = "joatmon08/hcp/aws"
   providers = {
     aws = aws.cloud
