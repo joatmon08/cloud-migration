@@ -3,7 +3,7 @@ locals {
   ui_name = "ui"
 }
 
-resource "kubernetes_service_account" "app" {
+resource "kubernetes_service_account" "ui" {
   metadata {
     name = local.ui_name
   }
@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "ui" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.app.metadata.0.name
+        service_account_name = kubernetes_service_account.ui.metadata.0.name
         container {
           image = "nicholasjackson/fake-service:v0.22.7"
           name  = local.ui_name
