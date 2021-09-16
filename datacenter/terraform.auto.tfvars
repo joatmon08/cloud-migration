@@ -1,4 +1,4 @@
-region       = "us-east-1"
-cloud_region = "us-west-2"
+region       = "us-west-2"
+cloud_region = "us-east-1"
 datacenter   = "datacenter"
 environment  = "cloud-migration"
