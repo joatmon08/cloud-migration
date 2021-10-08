@@ -22,7 +22,8 @@ resource "aws_instance" "app" {
 
   vpc_security_group_ids      = [module.vpc.default_security_group_id]
   subnet_id                   = module.vpc.private_subnets[0]
-  associate_public_ip_address = false
+  associate_public_ip_address = true
+  key_name                    = var.key_name
 
   user_data = templatefile("${path.module}/templates/app.tpl", {
     fake_service_version = var.fake_service_version
