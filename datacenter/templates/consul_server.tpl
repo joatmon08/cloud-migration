@@ -3,29 +3,15 @@ set -e
 
 apt-get update && apt-get install -y unzip
 
-# Versions
-ENVOY_VERSION="1.18.3"
-ENVOY_DOWNLOAD="https://func-e.io/install.sh"
-
-CONSUL_VERSION="1.10.1"
-CONSUL_DOWNLOAD="https://releases.hashicorp.com/consul/$${CONSUL_VERSION}/consul_$${CONSUL_VERSION}_linux_amd64.zip"
-
 # Get internal IP
 LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 
 cd /tmp
 
 # Fetch Consul
-curl -sSL --fail -o /tmp/consul.zip $${CONSUL_DOWNLOAD}
-unzip -d /tmp /tmp/consul.zip
-mv /tmp/consul /usr/bin/consul
-chmod +x /usr/bin/consul
-
-# Fetch Envoy
-curl -sSL --fail $${ENVOY_DOWNLOAD} | sudo bash -s -- -b /usr/local/bin
-func-e use $${ENVOY_VERSION}
-func-e run --version
-cp ~/.func-e/versions/$${ENVOY_VERSION}/bin/envoy /usr/bin/
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+apt-get update && apt-get install -y consul
 
 # Create the consul config
 mkdir -p /etc/consul
@@ -43,7 +29,7 @@ echo '${consul_key_file}' | base64 -d > /etc/consul/certs/datacenter-server-cons
 echo '${consul_ca_file}' | base64 -d > /etc/consul/certs/consul-agent-ca.pem
 %{ endif }
 
-cat << EOF > /etc/consul/config.hcl
+cat << EOF > /etc/consul.d/config.hcl
 data_dir = "/tmp/consul/server"
 
 server           = true
@@ -126,23 +112,6 @@ config_entries {
 }
 EOF
 
-# Setup system D
-cat << EOF > /etc/systemd/system/consul.service
-[Unit]
-Description=Consul Server
-After=syslog.target network.target
-[Service]
-ExecStart=/usr/bin/consul agent -config-file=/etc/consul/config.hcl
-ExecStop=/bin/sleep 5
-Restart=always
-[Install]
-WantedBy=multi-user.target
-EOF
-
-chmod 644 /etc/systemd/system/consul.service
-
-systemctl start consul.service
-
 %{ if primary_gateway != "" }
 # Setup systemd for mesh gateway
 cat << EOF > /etc/systemd/system/consul-gateway.service
@@ -163,7 +132,7 @@ EOF
 chmod 644 /etc/systemd/system/consul-gateway.service
 
 systemctl start consul-gateway.service
+%{ endif }
 
 systemctl daemon-reload
 systemctl start consul.service
-%{ endif }
