@@ -3,6 +3,10 @@ set -e
 
 apt-get update && apt-get install -y unzip
 
+# Versions
+ENVOY_VERSION="1.18.4"
+ENVOY_DOWNLOAD="https://func-e.io/install.sh"
+
 # Get internal IP
 LOCAL_IPV4=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 
@@ -12,6 +16,12 @@ cd /tmp
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 apt-get update && apt-get install -y consul
+
+# Fetch Envoy
+curl -sSL --fail $${ENVOY_DOWNLOAD} | sudo bash -s -- -b /usr/local/bin
+func-e use $${ENVOY_VERSION}
+func-e run --version
+cp ~/.func-e/versions/$${ENVOY_VERSION}/bin/envoy /usr/bin/
 
 # Create the consul config
 mkdir -p /etc/consul
@@ -112,6 +122,8 @@ config_entries {
 }
 EOF
 
+systemctl start consul.service
+
 %{ if primary_gateway != "" }
 # Setup systemd for mesh gateway
 cat << EOF > /etc/systemd/system/consul-gateway.service
@@ -132,7 +144,6 @@ EOF
 chmod 644 /etc/systemd/system/consul-gateway.service
 
 systemctl start consul-gateway.service
-%{ endif }
-
 systemctl daemon-reload
-systemctl start consul.service
+systemctl restart consul.service
+%{ endif }
