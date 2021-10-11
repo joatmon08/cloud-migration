@@ -21,7 +21,7 @@ resource "aws_instance" "app" {
   instance_type = "t2.micro"
 
   vpc_security_group_ids      = [module.vpc.default_security_group_id]
-  subnet_id                   = module.vpc.private_subnets[0]
+  subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
   key_name                    = var.key_name
 
